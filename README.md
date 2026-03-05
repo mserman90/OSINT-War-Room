@@ -78,8 +78,8 @@ I vibecoded 90% of this project using Gemini extension on Vs Code, Claude, and G
 
 1) Clone the repo:
 ```bash
-git clone https://github.com/Hue-Jhan/osint-war-room.git
-cd osint-war-room
+git clone https://github.com/Hue-Jhan/OSINT-War-Room
+cd OSINT-War-Room
 ``` 
 
 3) Install requirements (optionally in a virtual env):
