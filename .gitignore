@@ -22,4 +22,4 @@ Thumbs.db
 
 # Project Specific (Runtime Data)
 # backend/database.json
-*.log
+# *.log
