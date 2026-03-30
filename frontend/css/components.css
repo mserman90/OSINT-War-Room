@@ -447,3 +447,40 @@ input:checked + .slider:before {
 .map-link-label { font-weight: 600; flex: 1; }
 .map-link-source { font-size: 10px; color: var(--text-muted); margin-right: 4px; }
 .map-link-icon { font-size: 10px; color: var(--accent-primary); opacity: 0; transition: opacity 0.15s; }
+
+/* ── Theme & Language Toggle Group ─────────────────────────────────── */
+.toolbar-toggle-group {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+}
+.toolbar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-panel);
+    background: var(--bg-body);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-main);
+    transition: all 0.2s;
+    padding: 0;
+}
+.toolbar-toggle-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+}
+.toolbar-toggle-btn i {
+    font-size: 14px;
+}
+#lang-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}

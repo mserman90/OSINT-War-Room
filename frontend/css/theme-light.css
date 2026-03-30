@@ -1,0 +1,396 @@
+/* ── Light Theme ─────────────────────────────────────────────────── */
+/* Applied when <html data-theme="light"> is set                      */
+
+[data-theme="light"] {
+    /* Palette overrides */
+    --bg-body: #e8ecf1;
+    --bg-panel: #f1f5f9;
+    --bg-header: #dde3ea;
+    --border-panel: #bfc8d4;
+
+    /* Text */
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+
+    /* Accents remain unchanged for continuity */
+    --accent-primary: #2563eb;
+    --status-live: #059669;
+    --status-offline: #dc2626;
+    --status-warn: #d97706;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────── */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────── */
+[data-theme="light"] .sidebar-left {
+    background: #dde3ea;
+    border-right-color: #bfc8d4;
+}
+[data-theme="light"] .sidebar-select {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .nav-item {
+    color: #475569;
+}
+[data-theme="light"] .nav-item:hover,
+[data-theme="light"] .nav-item.active {
+    background-color: var(--accent-primary);
+    color: #ffffff;
+}
+
+/* ── Top Bar ──────────────────────────────────────────────────────── */
+[data-theme="light"] .top-bar {
+    background: #dde3ea;
+    border-bottom-color: #bfc8d4;
+}
+[data-theme="light"] .war-room-title {
+    color: #dc2626;
+}
+[data-theme="light"] .sub-title {
+    color: #64748b;
+}
+[data-theme="light"] .user-link {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .user-link:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
+}
+
+/* ── Region Toggles ───────────────────────────────────────────────── */
+[data-theme="light"] .region-toggles {
+    background: #f1f5f9;
+}
+[data-theme="light"] .region-btn {
+    color: #475569;
+}
+[data-theme="light"] .region-btn:hover {
+    color: #1e293b;
+    background: rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .region-btn.active {
+    background: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* ── News Ticker ──────────────────────────────────────────────────── */
+[data-theme="light"] .news-ticker-container {
+    background: #f1f5f9;
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .ticker-track::before {
+    background: linear-gradient(to right, #f1f5f9, transparent);
+}
+[data-theme="light"] .ticker-track::after {
+    background: linear-gradient(to left, #f1f5f9, transparent);
+}
+[data-theme="light"] .ticker-title {
+    color: #475569;
+}
+[data-theme="light"] .ticker-item:hover .ticker-title {
+    color: #1e293b;
+}
+[data-theme="light"] .ticker-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* ── DEFCON / Threat Meter ────────────────────────────────────────── */
+[data-theme="light"] #threat-meter {
+    background: #f1f5f9;
+    border-color: #bfc8d4;
+}
+
+/* ── Clock ────────────────────────────────────────────────────────── */
+[data-theme="light"] .live-container {
+    background: #f1f5f9;
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .clock-display {
+    color: #1e293b;
+}
+
+/* ── Panels ───────────────────────────────────────────────────────── */
+[data-theme="light"] .panel-card {
+    background: #f1f5f9;
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .panel-header {
+    background: #dde3ea;
+    border-bottom-color: #bfc8d4;
+}
+[data-theme="light"] .header-title {
+    color: #1e293b;
+}
+
+/* ── News Feed Cards ──────────────────────────────────────────────── */
+[data-theme="light"] .tweet-card {
+    background: #ffffff;
+    border-color: #d1d9e4;
+}
+[data-theme="light"] .tweet-card:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+[data-theme="light"] .tweet-user {
+    color: #1e293b;
+}
+[data-theme="light"] .tweet-content {
+    color: #334155;
+}
+[data-theme="light"] .tweet-link {
+    color: #64748b;
+}
+[data-theme="light"] .tweet-link:hover {
+    color: var(--accent-primary);
+}
+
+/* ── Webcam Tabs ──────────────────────────────────────────────────── */
+[data-theme="light"] .camera-tabs {
+    background: #dde3ea;
+    border-bottom-color: #bfc8d4;
+}
+[data-theme="light"] .cam-tab-btn {
+    color: #475569;
+}
+[data-theme="light"] .cam-tab-btn.active {
+    background: #ffffff;
+    color: #1e293b;
+}
+[data-theme="light"] .cam-overlay {
+    background: rgba(241, 245, 249, 0.85);
+    color: #1e293b;
+}
+
+/* ── Market Section ───────────────────────────────────────────────── */
+[data-theme="light"] .market-card {
+    background: #ffffff;
+    border-color: #d1d9e4;
+}
+[data-theme="light"] .card-title {
+    color: #1e293b;
+}
+[data-theme="light"] .market-row {
+    border-bottom-color: #e2e8f0;
+}
+[data-theme="light"] .market-symbol {
+    color: #1e293b;
+}
+[data-theme="light"] .market-price {
+    color: #334155;
+}
+[data-theme="light"] .market-header-row {
+    color: #64748b;
+    border-bottom-color: #d1d9e4;
+}
+
+/* ── Polymarket Cards ─────────────────────────────────────────────── */
+[data-theme="light"] .poly-card {
+    background: #ffffff;
+    border-color: #d1d9e4;
+}
+[data-theme="light"] .poly-question {
+    color: #1e293b;
+}
+[data-theme="light"] .poly-meta {
+    color: #64748b;
+}
+
+/* ── VIX Chart Area ───────────────────────────────────────────────── */
+[data-theme="light"] .vix-container {
+    background: #ffffff;
+    border-color: #d1d9e4;
+}
+[data-theme="light"] .vix-y-axis span {
+    color: #64748b;
+}
+[data-theme="light"] .vix-x-axis span {
+    color: #64748b;
+}
+[data-theme="light"] .vix-overlay h1 {
+    color: #1e293b;
+}
+
+/* ── Modals ───────────────────────────────────────────────────────── */
+[data-theme="light"] .modal {
+    background: #f1f5f9;
+    border-color: #bfc8d4;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+[data-theme="light"] .modal-content {
+    background: #f1f5f9;
+}
+[data-theme="light"] .modal-header {
+    border-bottom-color: #bfc8d4;
+}
+[data-theme="light"] .modal-header h3 {
+    color: #1e293b;
+}
+[data-theme="light"] .close-btn {
+    color: #64748b;
+}
+[data-theme="light"] .close-btn:hover {
+    color: #dc2626;
+}
+[data-theme="light"] .modal-section label {
+    color: #475569;
+}
+[data-theme="light"] .modal-section {
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .modal-select {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #1e293b;
+}
+[data-theme="light"] .settings-list {
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .add-row input {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #1e293b;
+}
+[data-theme="light"] .news-search-input {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #1e293b;
+}
+
+/* ── Nuke / Cyber Panels ─────────────────────────────────────────── */
+[data-theme="light"] #nuke-panel {
+    background: #f1f5f9;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+}
+[data-theme="light"] #nuke-panel select {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #1e293b;
+}
+[data-theme="light"] #nuke-clear-btn {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+[data-theme="light"] #cyber-panel {
+    background: #f1f5f9;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+}
+[data-theme="light"] .cyber-filter-btn {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #475569;
+}
+[data-theme="light"] .cyber-filter-btn.active {
+    background: var(--accent-primary);
+    color: #ffffff;
+}
+
+/* ── Radio Widget ─────────────────────────────────────────────────── */
+[data-theme="light"] #radio-widget {
+    background: #f1f5f9;
+    border-color: #059669;
+    box-shadow: 0 0 16px rgba(5, 150, 105, 0.12);
+}
+[data-theme="light"] #radio-widget select {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #059669;
+}
+[data-theme="light"] #radio-play-btn {
+    background: #ecfdf5;
+    border-color: #059669;
+    color: #059669;
+}
+[data-theme="light"] #radio-btn {
+    background: #f1f5f9;
+    border-color: #059669;
+    color: #059669;
+    box-shadow: 0 0 8px rgba(5, 150, 105, 0.2);
+}
+
+/* ── Split.js Gutters ─────────────────────────────────────────────── */
+[data-theme="light"] .gutter {
+    background-color: #bfc8d4;
+}
+[data-theme="light"] .gutter:hover {
+    background-color: #94a3b8;
+}
+
+/* ── Donate Rows ──────────────────────────────────────────────────── */
+[data-theme="light"] .donate-row {
+    background: #ffffff;
+    border-color: #d1d9e4;
+}
+[data-theme="light"] .crypto-address {
+    background: #f1f5f9;
+    color: #334155;
+    border-color: #bfc8d4;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────── */
+[data-theme="light"] .pizza-btn {
+    background: #fff7ed;
+    border-color: #f97316;
+    color: #f97316;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.25);
+}
+[data-theme="light"] .donate-btn {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.2);
+}
+
+/* ── Map Link Rows ────────────────────────────────────────────────── */
+[data-theme="light"] .map-link-row {
+    color: #475569;
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .map-link-row:hover {
+    background: rgba(37, 99, 235, 0.08);
+    color: #1e293b;
+}
+
+/* ── Search Wrapper ───────────────────────────────────────────────── */
+[data-theme="light"] .search-wrapper {
+    background: #ffffff;
+    border-color: #bfc8d4;
+}
+[data-theme="light"] .search-icon {
+    color: #64748b;
+}
+
+/* ── Layer Progress ───────────────────────────────────────────────── */
+[data-theme="light"] .layer-progress {
+    background: #dde3ea;
+}
+
+/* ── Theme/Lang Toggle Buttons ────────────────────────────────────── */
+[data-theme="light"] .toolbar-toggle-btn {
+    background: #ffffff;
+    border-color: #bfc8d4;
+    color: #475569;
+}
+[data-theme="light"] .toolbar-toggle-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+[data-theme="light"] .toolbar-toggle-btn.active {
+    background: var(--accent-primary);
+    color: #ffffff;
+    border-color: var(--accent-primary);
+}
