@@ -29,7 +29,8 @@ const channelNames = {
     "terroralarm": "Terror Alarm",
     "ConflictsTracker": "Conflicts Tracker",
     "twz": "The War Zone",
-    "usni": "USNI News"
+    "usni": "USNI News",
+    "firms": "FIRMS Intel"
 };
 
 function timeSince(dateString) {
@@ -70,6 +71,7 @@ function renderFeed(data = null) {
         else if (tweet.channel === 'ConflictsTracker') dotColor = '#a855f7'; // Glowing Purple
         else if (tweet.channel === 'twz') dotColor = '#f97316'; // Glowing Orange — The War Zone
         else if (tweet.channel === 'usni') dotColor = '#06b6d4'; // Glowing Cyan — USNI News
+        else if (tweet.channel === 'firms') dotColor = '#ef4444'; // Red — FIRMS Fire Intel
         const dotStyle = `background-color: ${dotColor}; color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};`
 
         const displayName = channelNames[tweet.channel] || tweet.channel;
@@ -599,6 +601,140 @@ function renderGDELTMonitor() {
         </div>`).join('');
 }
 
+// ── NASA FIRMS Military Base Fire Detection ──────────────────────────
+const FIRMS_MAP_KEY = '4ec95a34e8f7950e9f459b2886b02f2c';
+const MILITARY_BASES = [
+    // Middle East
+    {name: 'Al Udeid Air Base', lat: 25.117, lon: 51.315, r: 5, flag: '🇶🇦'},
+    {name: 'Prince Sultan Air Base', lat: 24.062, lon: 47.580, r: 8, flag: '🇸🇦'},
+    {name: 'Al Dhafra Air Base', lat: 24.248, lon: 54.547, r: 5, flag: '🇦🇪'},
+    {name: 'Incirlik Air Base', lat: 37.002, lon: 35.426, r: 4, flag: '🇹🇷'},
+    {name: 'Camp Arifjan', lat: 28.939, lon: 48.101, r: 4, flag: '🇰🇼'},
+    {name: 'Nevatim Air Base', lat: 31.208, lon: 34.933, r: 4, flag: '🇮🇱'},
+    {name: 'Ramon Air Base', lat: 30.776, lon: 34.667, r: 4, flag: '🇮🇱'},
+    {name: 'Hatzerim Air Base', lat: 31.234, lon: 34.662, r: 4, flag: '🇮🇱'},
+    {name: 'Natanz Nuclear', lat: 33.724, lon: 51.727, r: 3, flag: '🇮🇷'},
+    {name: 'Isfahan Nuclear', lat: 32.677, lon: 51.686, r: 4, flag: '🇮🇷'},
+    {name: 'Bushehr Nuclear', lat: 28.831, lon: 50.887, r: 3, flag: '🇮🇷'},
+    {name: 'Bandar Abbas Naval', lat: 27.159, lon: 56.233, r: 5, flag: '🇮🇷'},
+    {name: 'Shiraz Air Base', lat: 29.542, lon: 52.590, r: 4, flag: '🇮🇷'},
+    {name: 'Tehran Mehrabad', lat: 35.689, lon: 51.313, r: 4, flag: '🇮🇷'},
+    {name: 'Tabriz Air Base', lat: 38.134, lon: 46.235, r: 4, flag: '🇮🇷'},
+    {name: 'King Abdulaziz Air Base', lat: 26.265, lon: 50.152, r: 5, flag: '🇸🇦'},
+    // Ukraine/Russia/Europe
+    {name: 'Zaporizhzhia NPP', lat: 47.507, lon: 34.585, r: 3, flag: '🇺🇦'},
+    {name: 'Saky Airbase (Crimea)', lat: 45.093, lon: 33.586, r: 5, flag: '🇺🇦'},
+    {name: 'Engels Air Base', lat: 51.478, lon: 46.195, r: 5, flag: '🇷🇺'},
+    {name: 'Khmeimim Air Base', lat: 35.411, lon: 35.948, r: 4, flag: '🇷🇺'},
+    {name: 'Hmeimim (Syria)', lat: 35.401, lon: 35.949, r: 4, flag: '🇸🇾'},
+    // Asia-Pacific
+    {name: 'Diego Garcia', lat: -7.316, lon: 72.411, r: 5, flag: '🇬🇧'},
+];
+
+// Haversine distance in km
+function haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',');
+    return lines.slice(1).map(line => {
+        const vals = line.split(',');
+        const obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = vals[i]?.trim());
+        return obj;
+    });
+}
+
+async function fetchFIRMSData() {
+    if (appState.paused) return;
+    try {
+        // Fetch two bounding boxes: Middle East + Ukraine/Russia area
+        const regions = [
+            '25,44,60,20',  // Middle East (west,south,east,north format is actually west,south,east,north)
+            '28,44,55,55',  // Eastern Med + Iran
+            '30,35,50,52',  // Ukraine/Russia
+        ];
+        
+        const allDetections = [];
+        
+        await Promise.allSettled(regions.map(async (bbox) => {
+            try {
+                const url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_MAP_KEY}/VIIRS_SNPP_NRT/${bbox}/1`;
+                const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+                if (!res.ok) return;
+                const csv = await res.text();
+                const rows = parseCSV(csv);
+                
+                for (const row of rows) {
+                    const fireLat = parseFloat(row.latitude);
+                    const fireLon = parseFloat(row.longitude);
+                    if (isNaN(fireLat) || isNaN(fireLon)) continue;
+                    
+                    // Only nominal or high confidence
+                    const conf = (row.confidence || '').toLowerCase();
+                    if (conf === 'l') continue;
+                    
+                    // Check against all military bases
+                    for (const base of MILITARY_BASES) {
+                        const dist = haversineKm(fireLat, fireLon, base.lat, base.lon);
+                        if (dist <= base.r) {
+                            allDetections.push({
+                                base: base.name,
+                                flag: base.flag,
+                                lat: fireLat,
+                                lon: fireLon,
+                                frp: parseFloat(row.frp) || 0,
+                                brightness: parseFloat(row.bright_ti4) || 0,
+                                confidence: conf === 'h' ? 'HIGH' : 'NOMINAL',
+                                daynight: row.daynight === 'D' ? 'Day' : 'Night',
+                                distance: dist.toFixed(1),
+                                date: row.acq_date || '',
+                                time: row.acq_time || '',
+                            });
+                            break; // one base match per detection is enough
+                        }
+                    }
+                }
+            } catch(e) { /* skip failed region */ }
+        }));
+        
+        if (allDetections.length === 0) return;
+        
+        // Sort by FRP descending, limit to 20
+        allDetections.sort((a, b) => b.frp - a.frp);
+        const top = allDetections.slice(0, 20);
+        
+        // Convert to feed items
+        const feedItems = top.map((d, i) => {
+            const confColor = d.confidence === 'HIGH' ? '#ef4444' : '#f59e0b';
+            const firmsMapUrl = `https://firms.modaps.eosdis.nasa.gov/map/#d:24hrs;@${d.lon},${d.lat},14z`;
+            return {
+                id: `firms-${d.date}-${d.lat.toFixed(3)}-${d.lon.toFixed(3)}-${i}`,
+                url: firmsMapUrl,
+                source: 'firms',
+                channel: 'firms',
+                text: `<strong>🔥 Thermal anomaly near ${d.base} ${d.flag}</strong><br><span style="opacity:.7;font-size:11px;">FRP: <b>${d.frp.toFixed(1)} MW</b> | Confidence: <span style="color:${confColor};">${d.confidence}</span> | ${d.distance}km from base | ${d.daynight}</span>`,
+                timestamp: d.date ? new Date(d.date + 'T' + String(d.time).padStart(4,'0').replace(/(\d{2})(\d{2})/, '$1:$2') + ':00Z').toISOString() : new Date().toISOString(),
+                has_media: false
+            };
+        });
+        
+        if (feedItems.length) {
+            renderFeed(feedItems);
+            console.log(`[FIRMS] ${feedItems.length} military base thermal anomalies detected`);
+        }
+    } catch(e) {
+        console.warn('[FIRMS] fetch error:', e.message);
+    }
+}
+
 export function initDataPolling() {
     fetchMarketData();
     setInterval(fetchMarketData, 60000)
@@ -619,6 +755,10 @@ export function initDataPolling() {
     fetchUSNIFeed();
     setInterval(fetchTWZFeed, 300000);
     setInterval(fetchUSNIFeed, 300000);
+
+    // NASA FIRMS military base fire detection - fetch on boot + every 10 minutes
+    fetchFIRMSData();
+    setInterval(fetchFIRMSData, 600000);
 
     // GDELT Bilateral Threat Monitor – render placeholders then fetch on boot + every 5 minutes
     renderGDELTMonitor();
