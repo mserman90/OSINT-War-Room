@@ -708,14 +708,20 @@ function renderMilAircraft(map) {
     });
 
     // Update filter panel counts
+    let visibleTotal = 0;
     for (const [key, count] of Object.entries(counts)) {
         const el = document.getElementById(`mil-count-${key}`);
         if (el) el.textContent = count;
+        visibleTotal += count;
     }
     const totalEl = document.getElementById('mil-total-count');
-    if (totalEl) totalEl.textContent = window._milData.filter(a => a.lat && a.lon).length;
+    if (totalEl) {
+        const withPos = window._milData.filter(a => a.lat && a.lon).length;
+        totalEl.textContent = withPos;
+        totalEl.title = `${visibleTotal} visible / ${withPos} tracked`;
+    }
 
-    console.log(`[ADSB.LOL] Rendered military aircraft:`, counts);
+    console.log(`[ADSB.LOL] ${visibleTotal} rendered, ${window._milData.length} total from API`, counts);
 }
 
 async function fetchMilAircraft(map) {
