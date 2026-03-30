@@ -1,5 +1,4 @@
 import { initLayout, initModals, initClock, initWebcams } from './ui.js';
-import { initMap, initTrafficLayers, initNukeSimulator, initCyberPanel, initThreatMeter, initBodyCount, initRadio } from './map.js';
 import { initDataPolling } from './api.js';
 import { applyTranslations, setLang, getLang } from './i18n.js';
 
@@ -9,7 +8,6 @@ function initTheme() {
     document.documentElement.setAttribute('data-theme', saved);
     updateThemeIcon(saved);
 
-    // Top-bar toggle button
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
@@ -19,13 +17,11 @@ function initTheme() {
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('osint_theme', next);
             updateThemeIcon(next);
-            // Sync global settings dropdown
             const sel = document.getElementById('global-theme-select');
             if (sel) sel.value = next;
         });
     }
 
-    // Global settings dropdown
     const themeSel = document.getElementById('global-theme-select');
     if (themeSel) {
         themeSel.value = saved;
@@ -52,7 +48,6 @@ function initLang() {
     const saved = getLang();
     updateLangLabel(saved);
 
-    // Top-bar toggle button
     const langBtn = document.getElementById('lang-toggle-btn');
     if (langBtn) {
         langBtn.addEventListener('click', () => {
@@ -61,13 +56,11 @@ function initLang() {
             const next = current === 'en' ? 'tr' : 'en';
             setLang(next);
             updateLangLabel(next);
-            // Sync global settings dropdown
             const sel = document.getElementById('global-lang-select');
             if (sel) sel.value = next;
         });
     }
 
-    // Global settings dropdown
     const langSel = document.getElementById('global-lang-select');
     if (langSel) {
         langSel.value = saved;
@@ -78,7 +71,6 @@ function initLang() {
         });
     }
 
-    // Apply saved language on load
     applyTranslations();
 }
 
@@ -95,13 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initModals();
     initClock();
     initWebcams();
-    const map = initMap();
-    initTrafficLayers(map);
-    initNukeSimulator(map);
-    initCyberPanel(map);
-    initThreatMeter();
-    initBodyCount();
-    initRadio();
     initDataPolling();
 
     // Theme & Language

@@ -19,21 +19,7 @@ export function initLayout() {
         return defaultSizes;
     }
 
-    // Initialize Vertical Split
-    const verticalSplit = Split(['#pane-map', '#pane-data'], {
-        sizes: getSafeSplitSizes('split-sizes-vertical', [50, 50]),
-        minSize: [200, 200],
-        gutterSize: 10,
-        cursor: 'row-resize',
-        direction: 'vertical',
-        onDragEnd: function(sizes) {
-            localStorage.setItem('split-sizes-vertical', JSON.stringify(sizes));
-            // Trigger map resize if map exists globally or dispatch event
-            window.dispatchEvent(new Event('resize')); 
-        }
-    });
-
-    // Initialize Horizontal Split
+    // Initialize Horizontal Split (3 data columns)
     Split(['#col-comms', '#col-feeds', '#col-econ'], {
         sizes: getSafeSplitSizes('split-sizes-horizontal', [35, 38, 27]),
         minSize: [200, 200, 200],
@@ -49,71 +35,11 @@ export function initLayout() {
     const resetBtn = document.getElementById('reset-layout-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
-            localStorage.removeItem('split-sizes-vertical');
             localStorage.removeItem('split-sizes-horizontal');
             localStorage.removeItem('osint_dashboard_state');
             localStorage.removeItem('market_settings');
             localStorage.removeItem('webcam_settings');
             location.reload();
-        });
-    }
-
-    // Quick Snap Layout + Map Toggle
-    const snapUpBtn = document.getElementById('snap-up-btn');
-    const snapDownBtn = document.getElementById('snap-down-btn');
-    const paneMap = document.getElementById('pane-map');
-    let mapHidden = false;
-
-    // Snap Up: hide map, show only data panels
-    if (snapUpBtn && verticalSplit) {
-        snapUpBtn.addEventListener('click', () => {
-            window._sfx?.click();
-            if (!mapHidden) {
-                // Hide map completely
-                paneMap.style.display = 'none';
-                // Remove the gutter between panes
-                document.querySelector('.gutter-vertical')?.style.setProperty('display', 'none');
-                document.getElementById('pane-data').style.height = '100%';
-                mapHidden = true;
-                snapUpBtn.classList.add('active');
-                snapDownBtn.classList.remove('active');
-            } else {
-                // Restore
-                paneMap.style.display = '';
-                document.querySelector('.gutter-vertical')?.style.setProperty('display', '');
-                document.getElementById('pane-data').style.height = '';
-                verticalSplit.setSizes([50, 50]);
-                mapHidden = false;
-                snapUpBtn.classList.remove('active');
-                window.dispatchEvent(new Event('resize'));
-            }
-        });
-    }
-
-    // Snap Down: hide data panels, show only map
-    if (snapDownBtn && verticalSplit) {
-        snapDownBtn.addEventListener('click', () => {
-            window._sfx?.click();
-            const paneData = document.getElementById('pane-data');
-            if (paneData.style.display !== 'none') {
-                // Hide data panels completely
-                paneData.style.display = 'none';
-                document.querySelector('.gutter-vertical')?.style.setProperty('display', 'none');
-                paneMap.style.height = '100%';
-                paneMap.style.display = '';
-                mapHidden = false;
-                snapDownBtn.classList.add('active');
-                snapUpBtn.classList.remove('active');
-                window.dispatchEvent(new Event('resize'));
-            } else {
-                // Restore
-                paneData.style.display = '';
-                document.querySelector('.gutter-vertical')?.style.setProperty('display', '');
-                paneMap.style.height = '';
-                verticalSplit.setSizes([50, 50]);
-                snapDownBtn.classList.remove('active');
-                window.dispatchEvent(new Event('resize'));
-            }
         });
     }
 

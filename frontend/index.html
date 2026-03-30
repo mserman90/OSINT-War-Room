@@ -10,14 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet Measure CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-measure/dist/leaflet-measure.css" />
-    <!-- Leaflet Draw CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
-    <!-- Leaflet Legend CSS (Optional/Custom) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-legend@1.0.0/leaflet-legend.css" />
+
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -26,14 +19,6 @@
     <link rel="stylesheet" href="./css/theme-light.css">
     <!-- Split.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet Measure JS -->
-    <script src="https://unpkg.com/leaflet-measure/dist/leaflet-measure.js"></script>
-    <!-- Leaflet Draw JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <!-- Leaflet Legend JS -->
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-legend@1.0.0/leaflet-legend.js"></script>
 </head>
 <body>
 
@@ -49,84 +34,17 @@
                 </select>
             </div>
 
-            <!-- Middle: Tactical Icons -->
+            <!-- Middle: Tools -->
             <div class="sidebar-menu">
-                <button type="button" id="air-traffic-btn" class="nav-item" data-i18n-title="air_traffic" title="Air Traffic (ADS-B)"><i class="fa-solid fa-jet-fighter"></i></button>
-                <button type="button" id="maritime-btn" class="nav-item" data-i18n-title="maritime" title="Maritime Traffic (AIS)"><i class="fa-solid fa-ship"></i></button>
-                <button type="button" id="cyber-btn" class="nav-item" data-i18n-title="cyber" title="Live Cyberattacks"><i class="fa-solid fa-bug"></i></button>
-                <button type="button" id="nuke-btn" class="nav-item" data-i18n-title="nuke_sim" title="Nuclear Detonation Simulator"><i class="fa-solid fa-bomb"></i></button>
-                <button type="button" id="legend-btn" class="nav-item active" data-i18n-title="toggle_legend" title="Toggle Legend"><i class="fa-solid fa-list"></i></button>
                 <button type="button" id="live-maps-btn" class="nav-item" data-i18n-title="live_maps" title="Live Interactive Maps"><i class="fa-solid fa-map-location-dot"></i></button>
-            </div>
-
-            <div id="air-progress" class="layer-progress hidden" title="Loading aircraft...">
-                <div class="layer-progress-bar"></div>
-            </div>
-            <div id="maritime-progress" class="layer-progress hidden" title="Loading ships...">
-                <div class="layer-progress-bar"></div>
             </div>
 
             <!-- Bottom: Settings -->
             <div class="sidebar-bottom">
-                <div id="snap-up-btn" class="nav-item" data-i18n-title="maximize_bottom" title="Maximize Bottom Panel"><i class="fa-solid fa-chevron-up"></i></div>
-                <div id="snap-down-btn" class="nav-item" data-i18n-title="maximize_map" title="Maximize Map"><i class="fa-solid fa-chevron-down"></i></div>
                 <div id="reset-layout-btn" class="nav-item" data-i18n-title="reset_layout" title="Reset Layout"><i class="fa-solid fa-wrench"></i></div>
                 <div id="global-settings-btn" class="nav-item" data-i18n-title="settings" title="Settings"><i class="fa-solid fa-gear"></i></div>
             </div>
         </aside>
-
-        <div id="nuke-panel" class="hidden" style="
-            position:fixed; left:68px; top:50%;
-            transform:translateY(-50%);
-            background:#151821; border:1px solid #ef4444;
-            border-radius:8px; padding:14px; z-index:1100;
-            width:200px; box-shadow:0 0 20px rgba(239,68,68,0.3);
-            font-size:12px; color:#e2e8f0;
-        ">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <span style="font-weight:700;color:#ef4444;letter-spacing:1px;text-transform:uppercase;" data-i18n="nuke_sim_title">☢ Nuke Sim</span>
-                <button id="nuke-panel-close" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px;">×</button>
-            </div>
-            <select id="nuke-weapon-select" style="width:100%;background:#0b0e14;border:1px solid #2a2f3a;color:#e2e8f0;padding:6px;border-radius:4px;margin-bottom:10px;font-size:11px;">
-                <option value="15">Little Boy — 15 kt (Hiroshima)</option>
-                <option value="21">Fat Man — 21 kt (Nagasaki)</option>
-                <option value="100">W76 — 100 kt (Trident SLBM)</option>
-                <option value="340" selected>B61 — 340 kt (NATO)</option>
-                <option value="475">W88 — 475 kt (Trident SLBM)</option>
-                <option value="800">RS-28 Sarmat — 800 kt</option>
-                <option value="50000">Tsar Bomba — 50 Mt</option>
-            </select>
-            <div style="color:#64748b;font-size:10px;margin-bottom:10px;line-height:1.4;" data-i18n="click_to_detonate">Click anywhere on the map to detonate</div>
-            <button id="nuke-clear-btn" style="width:100%;background:#1a0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:5px;border-radius:4px;cursor:pointer;font-size:11px;">
-                <span data-i18n="clear_detonations">Clear All Detonations</span>
-            </button>
-            <div id="nuke-stats" style="margin-top:10px;font-size:10px;color:#94a3b8;display:none;">
-                <div id="nuke-stats-text"></div>
-            </div>
-        </div>
-
-        <div id="cyber-panel" class="hidden draggable-modal" style="
-            position:fixed; left:68px; top:20%;
-            background:#151821; border:1px solid #06b6d4;
-            border-radius:8px; padding:14px; z-index:1100;
-            width:240px; box-shadow:0 0 20px rgba(6,182,212,0.3);
-            font-size:12px; color:#e2e8f0;
-        ">
-            <div class="modal-header" style="border-color:#06b6d4;margin-bottom:10px;padding-bottom:8px;">
-                <span style="font-weight:700;color:#06b6d4;letter-spacing:1px;text-transform:uppercase;" data-i18n="cyber_intel">🛡 Cyber Intel</span>
-                <button id="cyber-panel-close" class="close-btn">×</button>
-            </div>
-            <div style="display:flex;gap:4px;margin-bottom:10px;flex-shrink:0;">
-                <button class="cyber-filter-btn active" data-type="all" data-i18n="all">All</button>
-                <button class="cyber-filter-btn" data-type="ddos" data-i18n="ddos">DDoS</button>
-                <button class="cyber-filter-btn" data-type="malware" data-i18n="malware">Malware</button>
-                <button class="cyber-filter-btn" data-type="exploit" data-i18n="exploit">Exploit</button>
-            </div>
-            <div id="cyber-feed" style="height:280px;overflow-y:auto;font-size:11px;"></div>
-            <div style="margin-top:8px;font-size:10px;color:#64748b;border-top:1px solid #2a2f3a;padding-top:6px;flex-shrink:0;">
-                <span data-i18n="source_cisa">Source: CISA KEV</span>
-            </div>
-        </div>
 
         <!-- Main Content Area -->
         <main class="main-area">
@@ -182,37 +100,9 @@
                 </div>
             </header>
 
-            <!-- Vertical Split Container (Map vs Bottom Data) -->
-            <div id="split-vertical" class="split-container-vertical">
-                
-                <!-- Top Pane: Map -->
-                <div id="pane-map" class="panel-card">
-                    <div id="map" style="width: 100%; height: 100%; background: #000;"></div>
-                    <div id="map-loading-overlay" style="
-                        position:absolute; inset:0; z-index:500;
-                        display:flex; flex-direction:column;
-                        align-items:center; justify-content:center;
-                        pointer-events:none;
-                        background: rgba(11,14,20,0.45);
-                        backdrop-filter: blur(2px);
-                        border-radius: var(--radius-lg);
-                        transition: opacity 0.5s;
-                    ">
-                        <div style="font-size:11px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">
-                            <span data-i18n="loading_intel">Loading Intel Layers</span>
-                        </div>
-                        <div style="width:180px;height:3px;background:#1a1e29;border-radius:2px;overflow:hidden;">
-                            <div id="map-loading-bar" style="height:100%;width:0%;background:#3b82f6;border-radius:2px;transition:width 0.4s ease;"></div>
-                        </div>
-                        <div id="map-loading-label" style="font-size:10px;color:#64748b;margin-top:8px;" data-i18n="initializing">Initializing...</div>
-                    </div>
-                </div>
-
-                <!-- Bottom Pane: 3 Columns -->
-                <!-- Note: This is a container, not a card itself, to allow gaps between children -->
-                <div id="pane-data" class="panel-container">
-                    <!-- Horizontal Split Container -->
-                    <div id="split-horizontal" class="split-container-horizontal">
+            <!-- Data Panels -->
+            <div id="pane-data" class="panel-container" style="flex:1;overflow:hidden;">
+                <div id="split-horizontal" class="split-container-horizontal" style="height:100%;">
                         
                         <!-- Col 1: Comms -->
                         <div id="col-comms" class="panel-card">
@@ -371,7 +261,6 @@
                             </div>
                         </div>
 
-                    </div>
                 </div>
             </div>
         </main>
@@ -494,29 +383,6 @@
         </div>
     </div>
 
-    <!-- Custom Marker Modal -->
-    <div id="marker-modal" class="modal hidden draggable-modal" style="z-index: 99999;">
-        <div class="modal-content">
-            <div class="modal-header drag-handle">
-                <h3 data-i18n="add_tactical_marker">ADD TACTICAL MARKER</h3>
-                <button id="close-marker-modal" class="close-btn">&times;</button>
-            </div>
-            <div class="modal-section">
-                <label data-i18n="title_tag">Title / Tag:</label>
-                <input type="text" id="marker-title-input" class="news-search-input" placeholder="e.g. Enemy Position">
-            </div>
-            <div class="modal-section">
-                <label data-i18n="color">Color:</label>
-                <select id="marker-color-select" class="modal-select"><option value="#ef4444">Red</option><option value="#3b82f6">Blue</option><option value="#f59e0b">Yellow</option><option value="#10b981">Green</option></select>
-            </div>
-            <div class="modal-section">
-                <label data-i18n="icon">Icon:</label>
-                <select id="marker-icon-select" class="modal-select"><option value="fa-crosshairs">Target</option><option value="fa-triangle-exclamation">Alert</option><option value="fa-campground">Base</option></select>
-            </div>
-            <button id="confirm-add-marker" data-i18n="place_marker" style="width:100%; padding:10px; background:var(--accent-primary); color:white; border:none; border-radius:4px; cursor:pointer;">PLACE MARKER</button>
-        </div>
-    </div>
-
     <!-- Part 3: Global Settings Modal -->
     <div id="global-settings-modal" class="modal hidden draggable-modal">
         <div class="modal-content">
@@ -624,41 +490,6 @@
     </div>
 
     <script type="module" src="./js/main.js"></script>
-
-    <div id="radio-widget" class="hidden" style="
-        position:fixed;bottom:20px;right:20px;z-index:1200;
-        background:#0f1117;border:1px solid #22c55e;border-radius:10px;
-        padding:12px 14px;width:220px;
-        box-shadow:0 0 24px rgba(34,197,94,0.2);
-        font-family:monospace;
-    ">
-        <div class="modal-header" style="border-color:#22c55e;margin-bottom:10px;padding-bottom:8px;cursor:grab;">
-            <span style="color:#22c55e;font-weight:700;font-size:11px;letter-spacing:2px;" data-i18n="radio_intercept">📻 RADIO INTERCEPT</span>
-            <button id="radio-close" class="close-btn" style="color:#22c55e;">×</button>
-        </div>
-        <select id="radio-station" style="width:100%;background:#0b0e14;border:1px solid #166534;color:#22c55e;padding:5px;border-radius:4px;font-family:monospace;font-size:11px;margin-bottom:10px;">
-            <option value="centcom" data-i18n="centcom">CENTCOM — Middle East</option>
-            <option value="nato" data-i18n="nato_ops">NATO OPS — Eastern Flank</option>
-            <option value="pacific" data-i18n="pacific_cmd">PACIFIC CMD — Taiwan Strait</option>
-            <option value="kiev" data-i18n="kyiv_ctrl">KYIV CTRL — Ukraine Front</option>
-            <option value="norad" data-i18n="norad">NORAD — Northern Warning</option>
-        </select>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <button id="radio-play-btn" style="background:#166534;border:1px solid #22c55e;color:#22c55e;padding:5px 14px;border-radius:4px;cursor:pointer;font-family:monospace;font-size:12px;" data-i18n="tune">▶ TUNE</button>
-            <div id="radio-signal" style="flex:1;height:24px;position:relative;overflow:hidden;border:1px solid #1a2a1a;border-radius:3px;background:#050805;">
-                <canvas id="radio-canvas" width="140" height="24" style="width:100%;height:100%;"></canvas>
-            </div>
-        </div>
-        <div id="radio-status" style="font-size:10px;color:#166534;letter-spacing:1px;" data-i18n="standby">STANDBY...</div>
-        <div id="radio-transcript" style="margin-top:8px;font-size:10px;color:#22c55e;min-height:32px;line-height:1.5;opacity:0.8;"></div>
-    </div>
-    <button id="radio-btn" style="
-        position:fixed;bottom:20px;right:20px;z-index:1201;
-        background:#0f1117;border:1px solid #22c55e;color:#22c55e;
-        border-radius:50%;width:42px;height:42px;cursor:pointer;
-        font-size:16px;box-shadow:0 0 12px rgba(34,197,94,0.3);
-        display:flex;align-items:center;justify-content:center;
-    " title="Radio Intercepts">📻</button>
     
 </body>
 </html>
