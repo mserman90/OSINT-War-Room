@@ -563,44 +563,172 @@ window._shipPositions  = {};   // mmsi → {lat,lon,name,heading,type}
 
 const AISSTREAM_KEY = 'xxx';
 
-// ── Fetch aircraft from OpenSky via backend ───────────────────────────────────
-async function fetchAircraft(map) {
-    try {
-        const b = map.getBounds();
-        const url = `/api/radar/aircraft?lamin=${b.getSouth().toFixed(2)}&lomin=${b.getWest().toFixed(2)}&lamax=${b.getNorth().toFixed(2)}&lomax=${b.getEast().toFixed(2)}`;
-        const res = await fetch(url);
-        const result = await res.json();
-        if (result.status !== 'success') return;
+// ── ADSB.LOL Military Aircraft Tracking ───────────────────────────────────────
 
-        window._aircraftLayer.clearLayers();
+// Aircraft type classification database
+const MIL_CATEGORIES = {
+    fighter:    { label: 'Fighter',    icon: 'fa-jet-fighter',         color: '#ef4444', emoji: '🔴' },
+    bomber:     { label: 'Bomber',     icon: 'fa-jet-fighter-up',      color: '#dc2626', emoji: '💥' },
+    tanker:     { label: 'Tanker',     icon: 'fa-gas-pump',            color: '#f97316', emoji: '⛽' },
+    transport:  { label: 'Transport',  icon: 'fa-plane',               color: '#3b82f6', emoji: '📦' },
+    helicopter: { label: 'Helicopter', icon: 'fa-helicopter',          color: '#22c55e', emoji: '🚁' },
+    isr:        { label: 'ISR / Recon',icon: 'fa-eye',                 color: '#a855f7', emoji: '👁' },
+    trainer:    { label: 'Trainer',    icon: 'fa-graduation-cap',      color: '#64748b', emoji: '🎓' },
+    uav:        { label: 'UAV / Drone',icon: 'fa-satellite-dish',      color: '#06b6d4', emoji: '🛸' },
+    other:      { label: 'Other',      icon: 'fa-plane-circle-exclamation', color: '#94a3b8', emoji: '✈️' }
+};
 
-        result.data.forEach(ac => {
-            const hdg = ac.heading || 0;
-            const marker = L.marker([ac.lat, ac.lon], {
-                icon: L.divIcon({
-                    html: `<div class="aircraft-icon" style="transform:rotate(${hdg}deg)">
-                               <i class="fa-solid fa-location-arrow" style="color:#38bdf8;font-size:11px;"></i>
-                           </div>`,
-                    className: '',
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 8]
-                }),
-                zIndexOffset: 500
-            }).addTo(window._aircraftLayer);
+// Type-code → category mapping
+const TYPE_MAP = {
+    // Fighters
+    F16: 'fighter', F15E: 'fighter', F15: 'fighter', F18: 'fighter', FA18: 'fighter',
+    F22: 'fighter', F35: 'fighter', F14: 'fighter', F5: 'fighter',
+    EUFI: 'fighter', TFIG: 'fighter', GROB: 'fighter', RAFALE: 'fighter', RAFA: 'fighter',
+    TORD: 'fighter', F4: 'fighter', MIG29: 'fighter', SU27: 'fighter', SU30: 'fighter',
+    SU35: 'fighter', JAS39: 'fighter', GRIPEN: 'fighter', M2KC: 'fighter',
+    A10: 'fighter', A10C: 'fighter',  // attack / CAS
+    // Bombers
+    B52: 'bomber', B52H: 'bomber', B1: 'bomber', B1B: 'bomber', B2: 'bomber',
+    B21: 'bomber', TU95: 'bomber', TU160: 'bomber', TU22M: 'bomber',
+    // Tankers
+    K35R: 'tanker', K35A: 'tanker', KC46: 'tanker', KC46A: 'tanker',
+    KC10: 'tanker', KC30: 'tanker', A332: 'tanker', A339: 'tanker',
+    A310: 'tanker', B762: 'tanker', MRTT: 'tanker',
+    // Transport
+    C17: 'transport', C5: 'transport', C5M: 'transport', C130: 'transport',
+    C30J: 'transport', C27J: 'transport', C160: 'transport', A400: 'transport',
+    C2: 'transport', C40: 'transport', IL76: 'transport', AN124: 'transport',
+    AN26: 'transport', C12: 'transport', B737: 'transport', B350: 'transport',
+    C550: 'transport', C560: 'transport', C56X: 'transport', GLF5: 'transport',
+    GLF4: 'transport', C680: 'transport', B738: 'transport', B734: 'transport',
+    C37A: 'transport', C37B: 'transport', C32: 'transport', VC25: 'transport',
+    // Helicopters
+    H60: 'helicopter', UH60: 'helicopter', HH60: 'helicopter', MH60: 'helicopter',
+    H47: 'helicopter', CH47: 'helicopter', AH64: 'helicopter', A129: 'helicopter',
+    H1: 'helicopter', AH1: 'helicopter', UH1: 'helicopter', V22: 'helicopter',
+    B212: 'helicopter', B412: 'helicopter', AS65: 'helicopter', EC45: 'helicopter',
+    EC35: 'helicopter', A139: 'helicopter', A149: 'helicopter', A119: 'helicopter',
+    NH90: 'helicopter', S70: 'helicopter', LYNX: 'helicopter', WILD: 'helicopter',
+    S92: 'helicopter', EC25: 'helicopter', EH10: 'helicopter', H135: 'helicopter',
+    H145: 'helicopter', H160: 'helicopter', H215: 'helicopter', S76: 'helicopter',
+    // ISR / Reconnaissance / AWACS / SIGINT
+    E3: 'isr', E3CF: 'isr', E3TF: 'isr', E6: 'isr', E6B: 'isr',
+    E2: 'isr', E2C: 'isr', E2D: 'isr', E8: 'isr',
+    RC135: 'isr', RC12: 'isr', RC26: 'isr',
+    P8: 'isr', P8A: 'isr', P3: 'isr', P3C: 'isr',
+    EP3: 'isr', EC30: 'isr', MC12: 'isr', U2: 'isr', U2S: 'isr',
+    S3: 'isr', RJ70: 'isr', E550: 'isr', GLF6: 'isr',
+    SENT: 'isr', R1: 'isr', ASTR: 'isr',
+    BE20: 'isr',  // Beechcraft King Air — common for ISR
+    DHC6: 'isr', DASH: 'isr',
+    TWR: 'isr',   // Tracker — maritime patrol
+    // Trainers
+    T38: 'trainer', T6: 'trainer', TEX2: 'trainer', TUCA: 'trainer',
+    T45: 'trainer', HAWK: 'trainer', PC21: 'trainer', PC9: 'trainer',
+    M346: 'trainer', L39: 'trainer', T50: 'trainer', PC7: 'trainer',
+    // UAV / Drones
+    MQ9: 'uav', MQ1: 'uav', RQ4: 'uav', RQ7: 'uav',
+    MQ25: 'uav', HRON: 'uav',
+};
 
-            marker.bindPopup(`
-                <div style="min-width:150px;font-size:12px">
-                    <b>✈️ ${ac.callsign}</b><br>
-                    <span style="color:#94a3b8">${ac.country}</span><br>
-                    Alt: <b>${ac.altitude.toLocaleString()} ft</b><br>
-                    Speed: <b>${ac.speed} kts</b><br>
-                    Heading: ${hdg}°
+// ADS-B category-based fallback classification
+function classifyMilAircraft(ac) {
+    const t = (ac.t || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    // Direct type match
+    if (TYPE_MAP[t]) return TYPE_MAP[t];
+    // Partial match
+    for (const [key, cat] of Object.entries(TYPE_MAP)) {
+        if (t.startsWith(key) || t.includes(key)) return cat;
+    }
+    // Category-based fallback (ADS-B category field)
+    const cat = ac.category || '';
+    if (cat === 'A7') return 'helicopter';  // Rotorcraft
+    if (cat === 'B1' || cat === 'B2') return 'uav'; // UAV/Drone
+    if (cat === 'A0' || cat === 'A1') return 'other'; // Light
+    return 'other';
+}
+
+// Layer groups per category
+window._milLayers = {};
+window._milFilters = {};
+window._milData = [];
+
+function initMilLayers() {
+    for (const key of Object.keys(MIL_CATEGORIES)) {
+        window._milLayers[key] = L.layerGroup();
+        window._milFilters[key] = true; // all visible by default
+    }
+}
+
+function renderMilAircraft(map) {
+    // Clear all sub-layers
+    for (const lg of Object.values(window._milLayers)) lg.clearLayers();
+
+    const counts = {};
+    for (const key of Object.keys(MIL_CATEGORIES)) counts[key] = 0;
+
+    window._milData.forEach(ac => {
+        if (!ac.lat || !ac.lon) return;
+        const cat = classifyMilAircraft(ac);
+        if (!window._milFilters[cat]) return; // filtered out
+
+        counts[cat] = (counts[cat] || 0) + 1;
+        const cfg = MIL_CATEGORIES[cat] || MIL_CATEGORIES.other;
+        const hdg = ac.track || 0;
+        const callsign = (ac.flight || '').trim() || ac.hex || '???';
+        const alt = ac.alt_baro === 'ground' ? 'GND' : (ac.alt_baro ? `${Number(ac.alt_baro).toLocaleString()} ft` : '?');
+        const spd = ac.gs ? `${Math.round(ac.gs)} kts` : '?';
+        const reg = ac.r || '';
+        const typeName = ac.t || '?';
+
+        const marker = L.marker([ac.lat, ac.lon], {
+            icon: L.divIcon({
+                html: `<div class="mil-ac-icon" style="transform:rotate(${hdg}deg)">
+                           <i class="fa-solid ${cfg.icon}" style="color:${cfg.color};font-size:12px;filter:drop-shadow(0 0 4px ${cfg.color});"></i>
+                       </div>`,
+                className: '',
+                iconSize: [18, 18],
+                iconAnchor: [9, 9]
+            }),
+            zIndexOffset: 600
+        }).addTo(window._milLayers[cat]);
+
+        marker.bindPopup(`
+            <div style="min-width:180px;font-size:12px;line-height:1.6">
+                <div style="font-weight:700;font-size:13px;color:${cfg.color};">
+                    <i class="fa-solid ${cfg.icon}" style="margin-right:4px;"></i> ${callsign}
                 </div>
-            `);
-        });
+                <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">${cfg.label} • ${typeName}${reg ? ' • ' + reg : ''}</div>
+                <div>Alt: <b>${alt}</b></div>
+                <div>Speed: <b>${spd}</b></div>
+                <div>Heading: <b>${Math.round(hdg)}°</b></div>
+                <div style="margin-top:4px;font-size:10px;color:#64748b;">ICAO: ${ac.hex} • SQ: ${ac.squawk || '?'}</div>
+            </div>
+        `);
+    });
 
-        console.log(`[Air] ${result.data.length} aircraft rendered`);
-    } catch(e) { console.warn('[Air] fetch error', e); }
+    // Update filter panel counts
+    for (const [key, count] of Object.entries(counts)) {
+        const el = document.getElementById(`mil-count-${key}`);
+        if (el) el.textContent = count;
+    }
+    const totalEl = document.getElementById('mil-total-count');
+    if (totalEl) totalEl.textContent = window._milData.filter(a => a.lat && a.lon).length;
+
+    console.log(`[ADSB.LOL] Rendered military aircraft:`, counts);
+}
+
+async function fetchMilAircraft(map) {
+    if (!window._aircraftActive) return;
+    try {
+        const res = await fetch('https://api.adsb.lol/v2/mil', { signal: AbortSignal.timeout(15000) });
+        const data = await res.json();
+        if (!data.ac) return;
+        window._milData = data.ac;
+        renderMilAircraft(map);
+    } catch (e) {
+        console.warn('[ADSB.LOL] fetch error:', e.message);
+    }
 }
 
 // AISStream WebSocket for ships
@@ -708,13 +836,66 @@ function classifyShip(typeCode) {
     return 'other';
 }
 
+// ── Military Aircraft Filter Panel Builder ──────────────────────────────
+function buildMilFilterPanel(map) {
+    // Create the panel element dynamically
+    const panel = document.createElement('div');
+    panel.id = 'mil-filter-panel';
+    panel.className = 'hidden';
+    panel.innerHTML = `
+        <div class="mil-panel-header">
+            <span>✈️ MIL AIRCRAFT</span>
+            <span id="mil-total-count" class="mil-total-badge">0</span>
+            <button id="mil-panel-close" class="mil-close-btn">×</button>
+        </div>
+        <div class="mil-filter-list">
+            ${Object.entries(MIL_CATEGORIES).map(([key, cfg]) => `
+                <label class="mil-filter-row" data-cat="${key}">
+                    <input type="checkbox" checked data-mil-cat="${key}">
+                    <i class="fa-solid ${cfg.icon}" style="color:${cfg.color};width:16px;text-align:center;"></i>
+                    <span class="mil-filter-label">${cfg.label}</span>
+                    <span id="mil-count-${key}" class="mil-count-badge" style="color:${cfg.color};">0</span>
+                </label>
+            `).join('')}
+        </div>
+        <div class="mil-panel-footer">
+            <span style="font-size:9px;color:#64748b;">ADSB.LOL • 15s refresh</span>
+        </div>
+    `;
+    document.body.appendChild(panel);
+
+    // Close button
+    document.getElementById('mil-panel-close')?.addEventListener('click', () => {
+        panel.classList.add('hidden');
+    });
+
+    // Filter checkboxes
+    panel.querySelectorAll('input[data-mil-cat]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const cat = cb.dataset.milCat;
+            window._milFilters[cat] = cb.checked;
+            if (cb.checked) {
+                map.addLayer(window._milLayers[cat]);
+            } else {
+                map.removeLayer(window._milLayers[cat]);
+            }
+            renderMilAircraft(map);
+        });
+    });
+}
+
 export function initTrafficLayers(map) {
     window._aircraftLayer = L.layerGroup();
     window._maritimeLayer = L.layerGroup();
+    initMilLayers();
+
+    // Build filter panel HTML
+    buildMilFilterPanel(map);
 
     // ── Air traffic button ────────────────────────────────────────
     const airBtn  = document.getElementById('air-traffic-btn');
     const airProg = document.getElementById('air-progress');
+    const milPanel = document.getElementById('mil-filter-panel');
 
     airBtn?.addEventListener('pointerdown', async () => {
         window._sfx?.click();
@@ -723,25 +904,34 @@ export function initTrafficLayers(map) {
             // Toggle OFF
             window._aircraftActive = false;
             airBtn.classList.remove('active');
-            window._aircraftLayer.clearLayers();
-            map.removeLayer(window._aircraftLayer);
+            // Remove all sub-layers
+            for (const lg of Object.values(window._milLayers)) {
+                lg.clearLayers();
+                map.removeLayer(lg);
+            }
+            milPanel?.classList.add('hidden');
+            clearInterval(window._aircraftInterval);
             return;
         }
         // Toggle ON
         window._aircraftActive = true;
         airBtn.classList.add('active');
         airProg?.classList.remove('hidden');
+        milPanel?.classList.remove('hidden');
 
-        map.addLayer(window._aircraftLayer);
-        await fetchAircraft(map);
+        // Add all enabled sub-layers to map
+        for (const [key, lg] of Object.entries(window._milLayers)) {
+            if (window._milFilters[key]) map.addLayer(lg);
+        }
 
+        await fetchMilAircraft(map);
         airProg?.classList.add('hidden');
 
-        // Refresh every 30s while active
+        // Refresh every 15s while active
         window._aircraftInterval = setInterval(async () => {
             if (!window._aircraftActive) { clearInterval(window._aircraftInterval); return; }
-            await fetchAircraft(map);
-        }, 30000);
+            await fetchMilAircraft(map);
+        }, 15000);
     });
 
     // Maritime button
