@@ -37,6 +37,7 @@
             <!-- Middle: Tools -->
             <div class="sidebar-menu">
                 <button type="button" id="live-maps-btn" class="nav-item" data-i18n-title="live_maps" title="Live Interactive Maps"><i class="fa-solid fa-map-location-dot"></i></button>
+                <button type="button" id="sdr-radio-btn" class="nav-item" title="SDR Radio Scanner"><i class="fa-solid fa-tower-broadcast"></i></button>
             </div>
 
             <!-- Bottom: Settings -->
@@ -479,6 +480,135 @@
                 </a>
                 <a href="https://venezuela.liveuamap.com/" target="_blank" class="map-link-row">
                     <span>🇻🇪</span><span class="map-link-label">Venezuela</span><span class="map-link-source">Liveuamap</span><i class="fa-solid fa-arrow-up-right-from-square map-link-icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDR Radio Scanner Modal -->
+    <div id="sdr-radio-modal" class="modal hidden draggable-modal" style="width:340px;">
+        <div class="modal-content" style="padding:0;overflow:hidden;width:340px;">
+            <div class="modal-header drag-handle" style="padding:12px 16px;margin-bottom:0;background:var(--bg-header);border-bottom:1px solid var(--border-panel);">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-tower-broadcast" style="color:#22c55e;"></i>
+                    <h3 style="font-size:13px;letter-spacing:1px;color:var(--text-primary);">SDR RADIO SCANNER</h3>
+                </div>
+                <button id="close-sdr-modal" class="close-btn">&times;</button>
+            </div>
+            <div style="padding:10px;max-height:70vh;overflow-y:auto;">
+
+                <!-- WebSDR Receivers -->
+                <div style="font-size:10px;color:#22c55e;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;text-shadow:0 0 8px rgba(34,197,94,0.5);">WebSDR / KiwiSDR Receivers</div>
+
+                <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Middle East & Eastern Mediterranean</div>
+                <a href="http://sdr.cyhams.org:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇨🇾</span><span class="sdr-link-label">Cyprus Amateur Radio Society</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://sdr.cyhams.org:8074/" target="_blank" class="sdr-link-row">
+                    <span>🇨🇾</span><span class="sdr-link-label">Cyprus KiwiSDR #2</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://web-888.no-ip.org:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇬🇷</span><span class="sdr-link-label">Athens, Greece — SV1BTL</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://sv5sdr.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
+                    <span>🇬🇷</span><span class="sdr-link-label">Rhodes Island, Greece</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://5b4az.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
+                    <span>🇨🇾</span><span class="sdr-link-label">Nicosia, Cyprus — 5B4AZ</span><span class="sdr-link-freq">HF</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+
+                <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Turkey & Black Sea</div>
+                <a href="http://ta4ial.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
+                    <span>🇹🇷</span><span class="sdr-link-label">Ankara, Turkey — TA4IAL</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://ta1sdr.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
+                    <span>🇹🇷</span><span class="sdr-link-label">Istanbul, Turkey</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+
+                <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Ukraine & Eastern Europe</div>
+                <a href="http://91.201.190.4:8901/" target="_blank" class="sdr-link-row">
+                    <span>🇺🇦</span><span class="sdr-link-label">Lviv, Ukraine — FAIRS WebSDR</span><span class="sdr-link-freq">HF</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://okno.ddns.net:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇵🇱</span><span class="sdr-link-label">Silesia, Poland</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://21684.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
+                    <span>🇨🇿</span><span class="sdr-link-label">Velvary, Czech Republic</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+
+                <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Global Coverage</div>
+                <a href="http://websdr.ewi.utwente.nl:8901/" target="_blank" class="sdr-link-row">
+                    <span>🇳🇱</span><span class="sdr-link-label">University of Twente — NL</span><span class="sdr-link-freq">0–29 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://g8ure.ddns.net:8074/" target="_blank" class="sdr-link-row">
+                    <span>🇬🇧</span><span class="sdr-link-label">Chichester, UK</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://f1jeksdr1.ddns.net:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇫🇷</span><span class="sdr-link-label">France — F1JEK</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://na5b.com" target="_blank" class="sdr-link-row">
+                    <span>🇺🇸</span><span class="sdr-link-label">Texas, USA — NA5B</span><span class="sdr-link-freq">VLF–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+
+                <div style="margin:12px 0 6px;border-top:1px solid var(--border-panel);padding-top:10px;">
+                    <div style="font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;text-shadow:0 0 8px rgba(249,115,22,0.5);">Military & SIGINT Frequencies</div>
+                </div>
+
+                <div class="sdr-freq-card">
+                    <div class="sdr-freq-title">HF Military & NATO</div>
+                    <div class="sdr-freq-item"><span>4724 kHz USB</span><span>USAF HFGCS (Mainsail)</span></div>
+                    <div class="sdr-freq-item"><span>6739 kHz USB</span><span>USAF HFGCS</span></div>
+                    <div class="sdr-freq-item"><span>8992 kHz USB</span><span>USAF HFGCS</span></div>
+                    <div class="sdr-freq-item"><span>11175 kHz USB</span><span>USAF HFGCS (Primary)</span></div>
+                    <div class="sdr-freq-item"><span>13200 kHz USB</span><span>USAF HFGCS</span></div>
+                    <div class="sdr-freq-item"><span>15016 kHz USB</span><span>USAF HFGCS</span></div>
+                </div>
+
+                <div class="sdr-freq-card">
+                    <div class="sdr-freq-title">HFDL — Aircraft Data Link</div>
+                    <div class="sdr-freq-item"><span>2986 kHz</span><span>Al Muharraq, Bahrain</span></div>
+                    <div class="sdr-freq-item"><span>5544 kHz</span><span>Al Muharraq, Bahrain</span></div>
+                    <div class="sdr-freq-item"><span>6646 kHz</span><span>Al Muharraq, Bahrain</span></div>
+                    <div class="sdr-freq-item"><span>8885 kHz</span><span>Al Muharraq, Bahrain</span></div>
+                    <div class="sdr-freq-item"><span>10030 kHz</span><span>Al Muharraq, Bahrain</span></div>
+                </div>
+
+                <div class="sdr-freq-card">
+                    <div class="sdr-freq-title">Maritime & Turkish Navy</div>
+                    <div class="sdr-freq-item"><span>4209.5 kHz CW</span><span>TAH Istanbul Radio</span></div>
+                    <div class="sdr-freq-item"><span>6510 kHz USB</span><span>TAH Istanbul Radio</span></div>
+                    <div class="sdr-freq-item"><span>8812 kHz USB</span><span>TAH Istanbul Radio</span></div>
+                    <div class="sdr-freq-item"><span>2182 kHz</span><span>Intl Distress Frequency</span></div>
+                </div>
+
+                <div class="sdr-freq-card">
+                    <div class="sdr-freq-title">SIGINT / Numbers Stations</div>
+                    <div class="sdr-freq-item"><span>4625 kHz</span><span>UVB-76 "The Buzzer" (RU)</span></div>
+                    <div class="sdr-freq-item"><span>5473 kHz USB</span><span>Russian Air Force</span></div>
+                    <div class="sdr-freq-item"><span>15770 kHz</span><span>Israel Silent Wave</span></div>
+                    <div class="sdr-freq-item"><span>14313 kHz USB</span><span>ME Monitoring Net</span></div>
+                </div>
+
+                <div style="margin-top:10px;border-top:1px solid var(--border-panel);padding-top:8px;">
+                    <div style="font-size:10px;color:#a855f7;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;text-shadow:0 0 8px rgba(168,85,247,0.5);">Resources</div>
+                </div>
+                <a href="http://www.websdr.org" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">WebSDR.org — All Receivers</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="http://kiwisdr.com/public/" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">KiwiSDR.com — Public Map</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="https://rx-tx.info/map-sdr-points" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">RX-TX.info — SDR World Map</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="https://priyom.org/military-stations" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">Priyom.org — Military Stations</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="https://www.broadcastify.com/listen/" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">Broadcastify — Live Scanners</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                </a>
+                <a href="https://shortwave.live/freq?target=ME" target="_blank" class="sdr-link-row">
+                    <span>🌐</span><span class="sdr-link-label">Shortwave.live — ME Schedule</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
             </div>
         </div>

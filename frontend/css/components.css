@@ -484,3 +484,79 @@ input:checked + .slider:before {
     font-weight: 800;
     letter-spacing: 0.5px;
 }
+
+/* ── SDR Radio Modal ──────────────────────────────────────────── */
+#sdr-radio-modal { top: 60px; left: 72px; transform: none; }
+
+.sdr-section-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin: 10px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sdr-section-label i { font-size: 9px; color: #ef4444; }
+
+.sdr-link-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    transition: background 0.15s, color 0.15s;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.sdr-link-row:hover {
+    background: rgba(34, 197, 94, 0.08);
+    color: var(--text-primary);
+}
+.sdr-link-row:hover .sdr-link-icon { opacity: 1; }
+.sdr-link-label { flex: 1; font-weight: 500; }
+.sdr-link-freq {
+    font-size: 9px;
+    color: #22c55e;
+    font-family: monospace;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.sdr-link-icon { font-size: 9px; color: #22c55e; opacity: 0; transition: opacity 0.15s; }
+
+.sdr-freq-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-panel);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+}
+.sdr-freq-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f97316;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.sdr-freq-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.sdr-freq-item span:first-child {
+    font-family: monospace;
+    color: #22c55e;
+    font-weight: 600;
+    font-size: 10px;
+}
+.sdr-freq-item span:last-child {
+    color: var(--text-muted);
+    font-size: 10px;
+}

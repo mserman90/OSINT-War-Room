@@ -67,7 +67,8 @@ export function initModals() {
         { btnId: 'webcam-settings-btn', modalId: 'webcam-settings-modal' },
         { btnId: 'market-settings-btn', modalId: 'market-settings-modal' },
         { btnId: 'global-settings-btn', modalId: 'global-settings-modal' },
-        { btnId: 'live-maps-btn', modalId: 'live-maps-modal' }
+        { btnId: 'live-maps-btn', modalId: 'live-maps-modal' },
+        { btnId: 'sdr-radio-btn', modalId: 'sdr-radio-modal' }
     ];
     // Attach isolated click listeners
     settingsMap.forEach(({ btnId, modalId }) => {
