@@ -28,7 +28,8 @@ const channelNames = {
     "OSINTWarfare": "OSINT Warfare",
     "terroralarm": "Terror Alarm",
     "ConflictsTracker": "Conflicts Tracker",
-    "twz": "The War Zone"
+    "twz": "The War Zone",
+    "usni": "USNI News"
 };
 
 function timeSince(dateString) {
@@ -68,6 +69,7 @@ function renderFeed(data = null) {
         else if (tweet.channel === 'terroralarm') dotColor = '#3b82f6'; // Glowing Blue
         else if (tweet.channel === 'ConflictsTracker') dotColor = '#a855f7'; // Glowing Purple
         else if (tweet.channel === 'twz') dotColor = '#f97316'; // Glowing Orange — The War Zone
+        else if (tweet.channel === 'usni') dotColor = '#06b6d4'; // Glowing Cyan — USNI News
         const dotStyle = `background-color: ${dotColor}; color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};`
 
         const displayName = channelNames[tweet.channel] || tweet.channel;
@@ -161,6 +163,47 @@ async function fetchTWZFeed() {
         if (items.length) renderFeed(items);
     } catch (e) {
         console.warn('[TWZ] RSS fetch failed:', e.message);
+    }
+}
+
+// ── USNI News RSS Feed ─────────────────────────────────────────────
+const USNI_FEED_URL = 'https://news.usni.org/feed';
+
+function parseUSNIFeed(xmlText) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, 'application/xml');
+    const items = doc.querySelectorAll('item');
+    const results = [];
+
+    items.forEach(item => {
+        const title = item.querySelector('title')?.textContent?.trim() || '';
+        const link  = item.querySelector('link')?.textContent?.trim() || '';
+        const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+        const desc = item.querySelector('description')?.textContent?.trim() || '';
+        const cleanDesc = desc.replace(/<[^>]*>/g, '').replace(/The post .* appeared first on .*\./, '').trim().slice(0, 200);
+        const id = 'usni-' + link.split('/').filter(Boolean).pop();
+
+        results.push({
+            id,
+            url: link,
+            source: 'rss',
+            channel: 'usni',
+            text: `<strong>${title}</strong>${cleanDesc ? '<br><span style="opacity:.7;font-size:11px;">' + cleanDesc + '</span>' : ''}`,
+            timestamp: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+            has_media: !!item.querySelector('enclosure')
+        });
+    });
+    return results;
+}
+
+async function fetchUSNIFeed() {
+    if (appState.paused) return;
+    try {
+        const xml = await fetchWithCorsProxy(USNI_FEED_URL);
+        const items = parseUSNIFeed(xml);
+        if (items.length) renderFeed(items);
+    } catch (e) {
+        console.warn('[USNI] RSS fetch failed:', e.message);
     }
 }
 
@@ -571,9 +614,11 @@ export function initDataPolling() {
     fetchLiveAlerts();
     setInterval(fetchLiveAlerts, 10000);
 
-    // The War Zone RSS feed – fetch on boot + every 5 minutes
+    // RSS feeds – fetch on boot + every 5 minutes
     fetchTWZFeed();
+    fetchUSNIFeed();
     setInterval(fetchTWZFeed, 300000);
+    setInterval(fetchUSNIFeed, 300000);
 
     // GDELT Bilateral Threat Monitor – render placeholders then fetch on boot + every 5 minutes
     renderGDELTMonitor();
