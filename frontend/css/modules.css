@@ -573,3 +573,31 @@
     font-size: 14px;
 }
 .cam-btn:hover { color: var(--accent-primary); }
+
+/* ── Webcam Fullscreen Mode ────────────────────────────────────────── */
+#col-feeds.webcam-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+    border: none;
+    background: #000;
+}
+#col-feeds.webcam-fullscreen .panel-header {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #2a2f3a;
+}
+#col-feeds.webcam-fullscreen .camera-tabs {
+    background: rgba(0, 0, 0, 0.75);
+    border-bottom: 1px solid #2a2f3a;
+}
+#col-feeds.webcam-fullscreen .panel-body {
+    height: calc(100vh - 80px);
+}
+#col-feeds.webcam-fullscreen .webcam-grid {
+    height: 100%;
+}

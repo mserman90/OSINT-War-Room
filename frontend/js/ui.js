@@ -450,6 +450,28 @@ export function initWebcams() {
     window.renderWebcamSettingsList = renderWebcamSettingsList;
     renderWebcams();
 
+    // ── Webcam Fullscreen Toggle ──────────────────────────────────────
+    const expandBtn = document.getElementById('webcam-expand-btn');
+    const colFeeds = document.getElementById('col-feeds');
+    if (expandBtn && colFeeds) {
+        expandBtn.addEventListener('click', () => {
+            window._sfx?.click();
+            const isFullscreen = colFeeds.classList.toggle('webcam-fullscreen');
+            const icon = expandBtn.querySelector('i');
+            if (icon) {
+                icon.className = isFullscreen ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            }
+        });
+        // ESC key to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && colFeeds.classList.contains('webcam-fullscreen')) {
+                colFeeds.classList.remove('webcam-fullscreen');
+                const icon = expandBtn.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-expand';
+            }
+        });
+    }
+
     // PART 4: MARKET SETTINGS LOGIC
     const marketModal = document.getElementById('market-settings-modal');
     const closeMarketBtn = document.getElementById('close-market-settings');
