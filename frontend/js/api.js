@@ -491,19 +491,18 @@ async function fetchGDELTData() {
             </div>`).join('');
     }
 
-    for (const pair of COUNTRY_PAIRS) {
+    // Fetch all pairs in parallel for speed
+    await Promise.allSettled(COUNTRY_PAIRS.map(async (pair) => {
         try {
             const apiUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(pair.query)}&mode=ToneChart&format=json&TIMESPAN=30d`;
             const raw = await fetchWithCorsProxy(apiUrl);
             const data = JSON.parse(raw);
             const bins = data.tonechart || [];
 
-            // Calculate weighted average tone
             let sumWeighted = 0, sumCount = 0;
             bins.forEach(b => { sumWeighted += b.bin * b.count; sumCount += b.count; });
             const avgTone = sumCount > 0 ? sumWeighted / sumCount : 0;
 
-            // Risk index: abs(avgTone) / 3.0 — normalized so ~avg tone of -7.5 = 2.5 (CRITICAL)
             const riskIndex = Math.abs(avgTone) / 3.0;
             const threat = gdeltThreatLevel(riskIndex);
             const sparkSvg = buildGDELTSparkline(bins, threat.color);
@@ -523,21 +522,21 @@ async function fetchGDELTData() {
                     <div class="gdelt-footer" style="color:${threat.color}88;">Index: ${riskIndex.toFixed(2)}</div>`;
             }
         } catch(e) {
-            console.warn(`[GDELT] Failed to fetch data for ${pair.id}:`, e.message);
+            console.warn(`[GDELT] ${pair.id} error:`, e.message);
             const card = document.getElementById(`gdelt-${pair.id}`);
             if (card) {
                 card.innerHTML = `
                     <div class="gdelt-card-header">
                         <span class="gdelt-flags">${pair.flagA}→${pair.flagB}</span>
                         <span class="gdelt-codes">${pair.codeA} / ${pair.codeB}</span>
-                        <span class="gdelt-badge" style="background:#ef444422; border:1px solid #ef444466; color:#ef4444;">ERROR</span>
+                        <span class="gdelt-badge" style="background:#ef444422; border:1px solid #ef444466; color:#ef4444;">RETRY</span>
                         <span class="gdelt-index" style="color:#555;">—</span>
                     </div>
-                    <div class="gdelt-spark-wrap"><div class="gdelt-spark-loading" style="background:#ef444418;"></div></div>
+                    <div class="gdelt-spark-wrap" style="height:50px;display:flex;align-items:center;justify-content:center;"><span style="font-size:10px;color:#64748b;">Retrying next cycle...</span></div>
                     <div class="gdelt-footer" style="color:#555;">Index: —</div>`;
             }
         }
-    }
+    }));
 }
 
 function renderGDELTMonitor() {
