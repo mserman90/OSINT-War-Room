@@ -27,7 +27,8 @@ const channelNames = {
     "aljazeeraglobal": "Al Jazeera",
     "OSINTWarfare": "OSINT Warfare",
     "terroralarm": "Terror Alarm",
-    "ConflictsTracker": "Conflicts Tracker"
+    "ConflictsTracker": "Conflicts Tracker",
+    "twz": "The War Zone"
 };
 
 function timeSince(dateString) {
@@ -66,6 +67,7 @@ function renderFeed(data = null) {
         else if (tweet.channel === 'OSINTWarfare') dotColor = '#22c55e'; // Glowing Green
         else if (tweet.channel === 'terroralarm') dotColor = '#3b82f6'; // Glowing Blue
         else if (tweet.channel === 'ConflictsTracker') dotColor = '#a855f7'; // Glowing Purple
+        else if (tweet.channel === 'twz') dotColor = '#f97316'; // Glowing Orange — The War Zone
         const dotStyle = `background-color: ${dotColor}; color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};`
 
         const displayName = channelNames[tweet.channel] || tweet.channel;
@@ -102,6 +104,63 @@ async function fetchLiveAlerts() {
         }
     } catch (error) {
         console.error("Error fetching alerts:", error);
+    }
+}
+
+// ── The War Zone (TWZ) RSS Feed ──────────────────────────────────
+const TWZ_FEED_URL = 'https://www.twz.com/feed';
+const CORS_PROXIES = [
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+];
+
+async function fetchWithCorsProxy(url) {
+    for (const proxyFn of CORS_PROXIES) {
+        try {
+            const res = await fetch(proxyFn(url), { signal: AbortSignal.timeout(12000) });
+            if (res.ok) return await res.text();
+        } catch (_) { /* try next proxy */ }
+    }
+    throw new Error('All CORS proxies failed for ' + url);
+}
+
+function parseTWZFeed(xmlText) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, 'application/xml');
+    const items = doc.querySelectorAll('item');
+    const results = [];
+
+    items.forEach(item => {
+        const title = item.querySelector('title')?.textContent?.trim() || '';
+        const link  = item.querySelector('link')?.textContent?.trim() || '';
+        const pubDate = item.querySelector('pubDate')?.textContent?.trim() || '';
+        const desc = item.querySelector('description')?.textContent?.trim() || '';
+        // Strip HTML tags from description for a clean snippet
+        const cleanDesc = desc.replace(/<[^>]*>/g, '').replace(/The post .* appeared first on The War Zone\./, '').trim();
+        const id = 'twz-' + link.split('/').filter(Boolean).pop();
+
+        results.push({
+            id,
+            url: link,
+            source: 'rss',
+            channel: 'twz',
+            text: `<strong>${title}</strong>${cleanDesc ? '<br><span style="opacity:.7;font-size:11px;">' + cleanDesc + '</span>' : ''}`,
+            timestamp: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+            has_media: !!item.querySelector('enclosure')
+        });
+    });
+    return results;
+}
+
+async function fetchTWZFeed() {
+    if (appState.paused) return;
+    try {
+        const xml = await fetchWithCorsProxy(TWZ_FEED_URL);
+        const items = parseTWZFeed(xml);
+        if (items.length) renderFeed(items);
+    } catch (e) {
+        console.warn('[TWZ] RSS fetch failed:', e.message);
     }
 }
 
@@ -397,6 +456,10 @@ export function initDataPolling() {
 
     fetchLiveAlerts();
     setInterval(fetchLiveAlerts, 10000);
+
+    // The War Zone RSS feed – fetch on boot + every 5 minutes
+    fetchTWZFeed();
+    setInterval(fetchTWZFeed, 300000);
 
     // Settings listeners for feed control
     const pauseCheckbox = document.getElementById('pause-news-updates');
