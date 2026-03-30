@@ -188,16 +188,10 @@ export function initModals() {
     });
 
     const pizzaModal = document.getElementById('pizza-modal');
-    const donateModal = document.getElementById('donate-modal');
 
     document.getElementById('pizza-btn')?.addEventListener('click', () => {
         window._sfx?.click();
         pizzaModal.classList.toggle('hidden');
-    });
-
-    document.getElementById('donate-btn')?.addEventListener('click', () => {
-        window._sfx?.click();
-        donateModal.classList.toggle('hidden');
     });
 
     window.copyToClipboard = (text, btn) => {
