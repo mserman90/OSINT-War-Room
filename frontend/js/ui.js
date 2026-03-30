@@ -164,10 +164,15 @@ export function initModals() {
     });
 
     const pizzaModal = document.getElementById('pizza-modal');
+    const pizzaIframe = document.getElementById('pizza-iframe');
 
     document.getElementById('pizza-btn')?.addEventListener('click', () => {
         window._sfx?.click();
-        pizzaModal.classList.toggle('hidden');
+        const isOpening = pizzaModal.classList.toggle('hidden') === false;
+        // Lazy-load iframe on first open
+        if (isOpening && pizzaIframe && !pizzaIframe.src.includes('pizzint')) {
+            pizzaIframe.src = 'https://www.pizzint.watch/';
+        }
     });
 
     window.copyToClipboard = (text, btn) => {

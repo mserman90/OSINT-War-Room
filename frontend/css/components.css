@@ -324,7 +324,7 @@
 }
 
 /* Specific Modal Positioning */
-#pizza-modal { top: 60px; left: calc(100vw - 340px); width: 380px; }
+#pizza-modal { top: 60px; left: calc(100vw - 440px); width: 420px; }
 
 #donate-modal { top: 300px; left: calc(100vw - 340px); }
 /* Global settings can stay centered or default */

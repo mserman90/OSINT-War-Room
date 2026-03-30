@@ -566,68 +566,7 @@ export function initDataPolling() {
     fetchTickerHeadlines();
     setInterval(fetchTickerHeadlines, 120000); // refresh every 2 minutes
 
-    async function fetchPizzaData() {
-        try {
-            const res = await fetch('/api/economy/pizza');
-            const result = await res.json();
-            if (result.status === 'success') renderPizzaModal(result.data);
-        } catch(e) { console.warn("Pizza fetch failed", e); }
-    }
-
-    function renderPizzaModal(data) {
-        const levelColors = { 1: '#ef4444', 2: '#f97316', 3: '#f59e0b', 4: '#10b981' };
-        const levelLabels = { 1: 'CRITICAL', 2: 'HIGH', 3: 'ELEVATED', 4: 'NORMAL' };
-        const color = levelColors[data.doughcon] || '#888';
-        const label = levelLabels[data.doughcon] || 'UNKNOWN';
-
-        const doughconEl = document.getElementById('pizza-doughcon-level');
-        if (doughconEl) {
-            doughconEl.innerHTML = `
-                <span style="font-size:20px; font-weight:900; letter-spacing:2px; color:${color}; text-shadow:0 0 14px ${color};">
-                    DOUGHCON ${data.doughcon}
-                </span>
-                <span class="pizza-badge" style="background:${color}22; border:1px solid ${color}; color:${color}; margin-left:8px;">
-                    ${label}
-                </span>`;
-        }
-
-        const statsEl = document.getElementById('pizza-stats');
-        if (statsEl) {
-            const waitText = data.avgWait > 0 ? `Avg wait: <b>${data.avgWait} min</b>` : 'Stores closed';
-            statsEl.innerHTML = `${waitText} &nbsp;·&nbsp; <b>${data.storesOpen}/${data.totalStores}</b> stores open`;
-        }
-
-        // Render history bar chart
-        const chartEl = document.getElementById('pizza-chart');
-        if (chartEl) {
-            if (!data.graph?.length) {
-                // API failed — flat bars with error message
-                chartEl.innerHTML = Array(12).fill(`<div class="pizza-bar" style="height:4%; background:#333;"></div>`).join('');
-                const statsEl = document.getElementById('pizza-stats');
-                if (statsEl) statsEl.innerHTML = `<span style="color:var(--status-offline);">⚠ Couldn't fetch data</span>`;
-            } else {
-                const alertColors = { low: '#555', elevated: '#f59e0b', high: '#f97316', critical: '#ef4444' };
-                // Use absolute avgWait values; scale relative to max in the dataset
-                // Use a fixed realistic max (45 min) so bars are proportional like the reference site
-                const maxWait = Math.max(...data.graph.map(p => p.avgWait), 45);
-                chartEl.innerHTML = data.graph.map(p => {
-                    // Closed stores (avgWait=0) → tiny stub; open stores scale to actual wait time
-                    const h = p.avgWait > 0 ? Math.max((p.avgWait / maxWait) * 100, 10) : 5;
-                    const c = alertColors[p.alertLevel] || '#555';
-                    const isActive = p.alertLevel !== 'low' && p.avgWait > 0;
-                    return `<div class="pizza-bar ${isActive ? 'active' : ''}" 
-                                style="height:${h}%; background:${c}; box-shadow:${isActive ? `0 0 6px ${c}88` : 'none'};"
-                                title="${p.avgWait > 0 ? p.avgWait + ' min avg wait' : 'closed'}">
-                            </div>`;
-                }).join('');
-            }
-        }
-
-        const timeEl = document.getElementById('pizza-timestamp');
-        if (timeEl && data.timestamp) timeEl.textContent = 'Updated ' + timeSince(data.timestamp) + ' ago';
-    }
-
-    document.getElementById('pizza-btn')?.addEventListener('pointerdown', fetchPizzaData);
+    // Pizza Index is now a live iframe embed of pizzint.watch (loaded by ui.js on modal open)
 
     fetchLiveAlerts();
     setInterval(fetchLiveAlerts, 10000);
