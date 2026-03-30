@@ -227,14 +227,25 @@ export function initClock() {
 export function initWebcams() {
     const cameraFeeds = {
         "Middle East": [
-            {url: "https://www.youtube.com/watch?v=-zGuR1qVKrU", title: "Iran", enabled: true},
-            {url: "https://www.youtube.com/watch?v=gmtlJ_m2r5A", title: "Israel & More", enabled: true},
-            {url: "https://www.youtube.com/watch?v=4E-iFtUM2kk", title: "Middle East Cam", enabled: true}
+            {url: "https://www.youtube.com/watch?v=-zGuR1qVKrU", title: "Iran — Tehran & Isfahan", enabled: true},
+            {url: "https://www.youtube.com/watch?v=gmtlJ_m2r5A", title: "Multi-Cam — Israel, Iran, Syria", enabled: true},
+            {url: "https://www.youtube.com/watch?v=KSwPNkzEgxg", title: "Israel — Tel Aviv, Haifa, Jerusalem", enabled: true},
+            {url: "https://www.youtube.com/watch?v=063BI2QIV3s", title: "Israel & US Attack Iran — Multi-Cam", enabled: true},
+            {url: "https://www.youtube.com/watch?v=eNQdzr1IKhU", title: "Tel Aviv Skyline", enabled: true},
+            {url: "https://www.youtube.com/watch?v=N3fiiEHqyp0", title: "Beirut — Baabda Skyline", enabled: true},
+            {url: "https://www.youtube.com/watch?v=3igWWQZKg08", title: "Beirut — AP Live", enabled: true},
+            {url: "https://www.youtube.com/watch?v=UK4i_EehMF4", title: "Gaza — Multi-Cam", enabled: true},
+            {url: "https://www.youtube.com/watch?v=Y79u9NLpJGE", title: "Yemen & Red Sea — Multi-Cam", enabled: true},
+            {url: "https://www.youtube.com/watch?v=QCrw64Pc67Q", title: "Beirut, Doha, Tel Aviv, Jerusalem", enabled: true},
+            {url: "https://www.youtube.com/watch?v=4oPef4gV0X0", title: "Baghdad — Al-Rasheed", enabled: true},
+            {url: "https://www.youtube.com/watch?v=RnMTigmZA10", title: "US-Iran War — 24/7 News", enabled: true}
         ],
         "Ukraine": [
-            {url: "https://www.youtube.com/watch?v=R-qCsZ1obbc", title: "Kyiv Cam 1", enabled: true},
-            {url: "https://www.youtube.com/watch?v=11mdFpvFvqU", title: "Ukraine City", enabled: true},
-            {url: "https://www.youtube.com/watch?v=e2gC37ILQmk", title: "Odessa", enabled: true}
+            {url: "https://www.youtube.com/watch?v=e2gC37ILQmk", title: "Ukraine Multi-Cam — Kyiv, Kharkiv, Odessa", enabled: true},
+            {url: "https://www.youtube.com/watch?v=R-qCsZ1obbc", title: "Kyiv — City Cam", enabled: true},
+            {url: "https://www.youtube.com/watch?v=yPxfXVjNVsg", title: "Ukraine — Kharkiv, Donetsk, Zaporizhzhia", enabled: true},
+            {url: "https://www.youtube.com/watch?v=11mdFpvFvqU", title: "Ukraine — City View", enabled: true},
+            {url: "https://www.youtube.com/watch?v=wKgJgVo0Mak", title: "Ukraine — Kharkiv, Donetsk, Kyiv", enabled: true}
         ],
         "Space": [
             {url: "https://www.youtube.com/watch?v=GdFTOGOa9_M", title: "ISS Live 2", enabled: true},
@@ -245,11 +256,18 @@ export function initWebcams() {
         ]
     };
 
-    let webcamSettings = JSON.parse(localStorage.getItem('webcam_settings')) || {
-        activeTab: "Global",
-        feeds: cameraFeeds,
-        layout: 'auto'
-    };
+    // Version bump forces refresh of default feeds when new cameras are added
+    const WEBCAM_VERSION = 2;
+    let webcamSettings = JSON.parse(localStorage.getItem('webcam_settings'));
+    if (!webcamSettings || webcamSettings._v !== WEBCAM_VERSION) {
+        webcamSettings = {
+            _v: WEBCAM_VERSION,
+            activeTab: "Global",
+            feeds: cameraFeeds,
+            layout: 'auto'
+        };
+        localStorage.setItem('webcam_settings', JSON.stringify(webcamSettings));
+    }
 
     const gridLayoutSelect = document.getElementById('webcam-grid-layout');
     const openWebcamBtn = document.getElementById('webcam-settings-btn');
