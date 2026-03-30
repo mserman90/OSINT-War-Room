@@ -601,3 +601,199 @@
 #col-feeds.webcam-fullscreen .webcam-grid {
     height: 100%;
 }
+
+/* ── GDELT Bilateral Threat Monitor ───────────────────────────────── */
+
+.gdelt-header {
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid var(--border-panel);
+    margin-bottom: 10px;
+}
+
+.gdelt-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #f97316;
+    text-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+    margin-bottom: 3px;
+    font-family: monospace;
+}
+
+.gdelt-subtitle {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+}
+
+.gdelt-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.gdelt-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 9px;
+    color: var(--text-muted);
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gdelt-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Enable container queries on the parent card */
+#module-gdelt {
+    container-type: inline-size;
+}
+
+/* Grid: 2 columns by default, 3 columns if panel is wide */
+#gdelt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 4px 6px;
+}
+
+@container (min-width: 420px) {
+    #gdelt-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.gdelt-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 8px 8px 6px;
+    font-family: 'Courier New', Courier, monospace;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    min-width: 0;
+}
+
+.gdelt-card-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    min-width: 0;
+}
+
+.gdelt-flags {
+    font-size: 13px;
+    letter-spacing: 0;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.gdelt-codes {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.gdelt-badge {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.gdelt-index {
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Courier New', Courier, monospace;
+    flex-shrink: 0;
+    letter-spacing: -0.5px;
+}
+
+.gdelt-spark-wrap {
+    width: 100%;
+    height: 32px;
+    overflow: hidden;
+    border-radius: 2px;
+    margin-bottom: 4px;
+    background: rgba(0,0,0,0.2);
+}
+
+.gdelt-sparkline {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.gdelt-spark-loading {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%);
+    background-size: 200% 100%;
+    animation: gdelt-shimmer 1.5s infinite;
+    border-radius: 2px;
+}
+
+@keyframes gdelt-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.gdelt-footer {
+    font-size: 9px;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Light theme overrides */
+[data-theme="light"] .gdelt-title {
+    color: #c2410c;
+    text-shadow: none;
+}
+
+[data-theme="light"] .gdelt-card {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .gdelt-codes {
+    color: #374151;
+}
+
+[data-theme="light"] .gdelt-spark-wrap {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .gdelt-footer {
+    color: #6b7280;
+}
+
+[data-theme="light"] .gdelt-subtitle {
+    color: #6b7280;
+}
+
+[data-theme="light"] .gdelt-legend-item {
+    color: #6b7280;
+}

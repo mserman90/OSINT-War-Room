@@ -381,6 +381,182 @@ function updateTicker(headlines) {
     content.style.animationDuration = `${duration}s`;
 }
 
+// ── GDELT Bilateral Threat Monitor ──────────────────────────────────
+const COUNTRY_PAIRS = [
+    {
+        id: 'usa-irn',
+        nameA: 'USA', nameB: 'IRN',
+        codeA: 'USA', codeB: 'IRN',
+        flagA: '🇺🇸', flagB: '🇮🇷',
+        query: '(USA OR Iran) conflict war tension'
+    },
+    {
+        id: 'rus-ukr',
+        nameA: 'RUS', nameB: 'UKR',
+        codeA: 'RUS', codeB: 'UKR',
+        flagA: '🇷🇺', flagB: '🇺🇦',
+        query: '(Russia OR Ukraine) conflict war tension'
+    },
+    {
+        id: 'usa-chn',
+        nameA: 'USA', nameB: 'CHN',
+        codeA: 'USA', codeB: 'CHN',
+        flagA: '🇺🇸', flagB: '🇨🇳',
+        query: '(USA OR China) conflict war tension'
+    },
+    {
+        id: 'chn-twn',
+        nameA: 'CHN', nameB: 'TWN',
+        codeA: 'CHN', codeB: 'TWN',
+        flagA: '🇨🇳', flagB: '🇹🇼',
+        query: '(China OR Taiwan) conflict war tension'
+    },
+    {
+        id: 'isr-irn',
+        nameA: 'ISR', nameB: 'IRN',
+        codeA: 'ISR', codeB: 'IRN',
+        flagA: '🇮🇱', flagB: '🇮🇷',
+        query: '(Israel OR Iran) conflict war tension'
+    },
+    {
+        id: 'usa-rus',
+        nameA: 'USA', nameB: 'RUS',
+        codeA: 'USA', codeB: 'RUS',
+        flagA: '🇺🇸', flagB: '🇷🇺',
+        query: '(USA OR Russia) conflict war tension'
+    }
+];
+
+function gdeltThreatLevel(index) {
+    if (index < 0.5)  return { label: 'LOW',      color: '#10b981' };
+    if (index < 1.0)  return { label: 'MODERATE', color: '#06b6d4' };
+    if (index < 1.5)  return { label: 'ELEVATED', color: '#eab308' };
+    if (index < 2.5)  return { label: 'HIGH',     color: '#f97316' };
+    return               { label: 'CRITICAL',  color: '#ef4444' };
+}
+
+function buildGDELTSparkline(bins, color) {
+    if (!bins || bins.length === 0) return '<svg class="gdelt-sparkline" viewBox="0 0 120 32"></svg>';
+
+    // Use the distribution of tone bins as the sparkline
+    // Sort bins by bin value (tone score) to ensure proper ordering
+    const sorted = [...bins].sort((a, b) => a.bin - b.bin);
+    const counts = sorted.map(b => b.count);
+    const maxCount = Math.max(...counts, 1);
+    const n = sorted.length;
+    const W = 120, H = 32;
+    const step = W / Math.max(n - 1, 1);
+
+    // Build polyline points
+    const points = sorted.map((b, i) => {
+        const x = i * step;
+        const y = H - (b.count / maxCount) * (H - 4) - 2;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+
+    // Build filled area path
+    const firstX = 0;
+    const lastX = ((n - 1) * step).toFixed(1);
+    const areaPoints = `0,${H} ` + points + ` ${lastX},${H}`;
+
+    return `<svg class="gdelt-sparkline" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <defs>
+            <linearGradient id="sg-${Math.random().toString(36).slice(2,7)}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="${color}" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="${color}" stop-opacity="0.02"/>
+            </linearGradient>
+        </defs>
+        <polygon points="${areaPoints}" fill="${color}" fill-opacity="0.15"/>
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>`;
+}
+
+async function fetchGDELTData() {
+    const grid = document.getElementById('gdelt-grid');
+    if (!grid) return;
+
+    // Show loading skeletons on first call if grid is empty
+    if (!grid.dataset.initialized) {
+        grid.dataset.initialized = '1';
+        grid.innerHTML = COUNTRY_PAIRS.map(p => `
+            <div class="gdelt-card" id="gdelt-${p.id}">
+                <div class="gdelt-card-header">
+                    <span class="gdelt-flags">${p.flagA}→${p.flagB}</span>
+                    <span class="gdelt-codes">${p.codeA} / ${p.codeB}</span>
+                    <span class="gdelt-badge" style="background:#ffffff18; color:#888;">LOADING</span>
+                    <span class="gdelt-index" style="color:#555;">—</span>
+                </div>
+                <div class="gdelt-spark-wrap"><div class="gdelt-spark-loading"></div></div>
+                <div class="gdelt-footer">Index: —</div>
+            </div>`).join('');
+    }
+
+    for (const pair of COUNTRY_PAIRS) {
+        try {
+            const apiUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(pair.query)}&mode=ToneChart&format=json&TIMESPAN=30d`;
+            const raw = await fetchWithCorsProxy(apiUrl);
+            const data = JSON.parse(raw);
+            const bins = data.tonechart || [];
+
+            // Calculate weighted average tone
+            let sumWeighted = 0, sumCount = 0;
+            bins.forEach(b => { sumWeighted += b.bin * b.count; sumCount += b.count; });
+            const avgTone = sumCount > 0 ? sumWeighted / sumCount : 0;
+
+            // Risk index: abs(avgTone) / 3.0 — normalized so ~avg tone of -7.5 = 2.5 (CRITICAL)
+            const riskIndex = Math.abs(avgTone) / 3.0;
+            const threat = gdeltThreatLevel(riskIndex);
+            const sparkSvg = buildGDELTSparkline(bins, threat.color);
+
+            const card = document.getElementById(`gdelt-${pair.id}`);
+            if (card) {
+                card.style.borderColor = threat.color + '44';
+                card.style.boxShadow = `0 0 8px ${threat.color}18`;
+                card.innerHTML = `
+                    <div class="gdelt-card-header">
+                        <span class="gdelt-flags">${pair.flagA}→${pair.flagB}</span>
+                        <span class="gdelt-codes">${pair.codeA} / ${pair.codeB}</span>
+                        <span class="gdelt-badge" style="background:${threat.color}22; border:1px solid ${threat.color}66; color:${threat.color};">${threat.label}</span>
+                        <span class="gdelt-index" style="color:${threat.color}; text-shadow:0 0 8px ${threat.color}88;">${riskIndex.toFixed(2)}</span>
+                    </div>
+                    <div class="gdelt-spark-wrap">${sparkSvg}</div>
+                    <div class="gdelt-footer" style="color:${threat.color}88;">Index: ${riskIndex.toFixed(2)}</div>`;
+            }
+        } catch(e) {
+            console.warn(`[GDELT] Failed to fetch data for ${pair.id}:`, e.message);
+            const card = document.getElementById(`gdelt-${pair.id}`);
+            if (card) {
+                card.innerHTML = `
+                    <div class="gdelt-card-header">
+                        <span class="gdelt-flags">${pair.flagA}→${pair.flagB}</span>
+                        <span class="gdelt-codes">${pair.codeA} / ${pair.codeB}</span>
+                        <span class="gdelt-badge" style="background:#ef444422; border:1px solid #ef444466; color:#ef4444;">ERROR</span>
+                        <span class="gdelt-index" style="color:#555;">—</span>
+                    </div>
+                    <div class="gdelt-spark-wrap"><div class="gdelt-spark-loading" style="background:#ef444418;"></div></div>
+                    <div class="gdelt-footer" style="color:#555;">Index: —</div>`;
+            }
+        }
+    }
+}
+
+function renderGDELTMonitor() {
+    // Initial render with placeholder cards before data loads
+    const grid = document.getElementById('gdelt-grid');
+    if (!grid) return;
+    grid.innerHTML = COUNTRY_PAIRS.map(p => `
+        <div class="gdelt-card" id="gdelt-${p.id}">
+            <div class="gdelt-card-header">
+                <span class="gdelt-flags">${p.flagA}→${p.flagB}</span>
+                <span class="gdelt-codes">${p.codeA} / ${p.codeB}</span>
+                <span class="gdelt-badge" style="background:#ffffff18; color:#888;">—</span>
+                <span class="gdelt-index" style="color:#555;">—</span>
+            </div>
+            <div class="gdelt-spark-wrap"><div class="gdelt-spark-loading"></div></div>
+            <div class="gdelt-footer">Index: —</div>
+        </div>`).join('');
+}
+
 export function initDataPolling() {
     fetchMarketData();
     setInterval(fetchMarketData, 60000)
@@ -460,6 +636,11 @@ export function initDataPolling() {
     // The War Zone RSS feed – fetch on boot + every 5 minutes
     fetchTWZFeed();
     setInterval(fetchTWZFeed, 300000);
+
+    // GDELT Bilateral Threat Monitor – render placeholders then fetch on boot + every 5 minutes
+    renderGDELTMonitor();
+    fetchGDELTData();
+    setInterval(fetchGDELTData, 300000);
 
     // Settings listeners for feed control
     const pauseCheckbox = document.getElementById('pause-news-updates');
