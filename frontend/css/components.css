@@ -83,7 +83,7 @@
 
 /* News Ticker */
 .news-ticker-container {
-    flex: 0 1 310px;
+    flex: 1 1 200px;
     min-width: 0;
     overflow: hidden;
     margin: 0 12px;

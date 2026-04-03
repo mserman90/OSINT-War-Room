@@ -52,33 +52,17 @@
             <!-- Top Sidebar: Map Toggles -->
             <header class="top-bar">
                 <div class="top-left">
-                    <div class="war-room-title"><i class="fa-solid fa-satellite-dish"></i> <span data-i18n="war_room">WAR ROOM</span> <span class="sub-title" data-i18n="subtitle">- Global Osint Monitoring</span></div>
+                    <div class="war-room-title"><i class="fa-solid fa-satellite-dish"></i> <span data-i18n="war_room">WAR ROOM</span></div>
 
                 </div>
                 
                 <div class="news-ticker-container">
-                    <span class="ticker-label" data-i18n="live">LIVE</span>
                     <div class="ticker-track">
-                        <div id="ticker-content" class="ticker-content" data-i18n="loading_headlines">Loading headlines...</div>
+                        <div id="ticker-content" class="ticker-content"></div>
                     </div>
                 </div>
 
-                <div id="threat-meter" title="Global Threat Level" style="
-                    display:flex;align-items:center;gap:8px;
-                    background:#0b0e14;border:1px solid #2a2f3a;
-                    border-radius:6px;padding:5px 12px;cursor:default;
-                ">
-                    <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;" data-i18n="defcon">DEFCON</span>
-                    <span id="defcon-level" style="font-size:20px;font-weight:900;font-family:monospace;color:#10b981;">5</span>
-                    <div style="display:flex;flex-direction:column;gap:2px;">
-                        <span id="defcon-label" style="font-size:10px;font-weight:700;color:#10b981;" data-i18n="peace">PEACE</span>
-                        <div id="defcon-bar" style="width:60px;height:3px;background:#1a1e29;border-radius:2px;overflow:hidden;">
-                            <div id="defcon-fill" style="height:100%;width:20%;background:#10b981;transition:all 1s;border-radius:2px;"></div>
-                        </div>
-                    </div>
-                </div>
 
-                <button id="pizza-btn" class="nav-btn pizza-btn" data-i18n="pizza_index">🍕 PIZZA INDEX</button>
 
                 <div class="top-right">
                     <div class="live-container">
@@ -438,22 +422,7 @@
         </div>
     </div>
 
-<!-- Pizza Tracker Modal — Live PizzINT Embed -->
-    <div id="pizza-modal" class="modal hidden draggable-modal" style="width:420px;">
-        <div class="modal-content" style="width:420px;padding:0;overflow:hidden;">
-            <div class="modal-header drag-handle" style="padding:10px 16px;margin-bottom:0;background:var(--bg-header);border-bottom:1px solid var(--border-panel);">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:18px;">🍕</span>
-                    <h3 style="font-size:13px;letter-spacing:1px;color:var(--text-primary);" data-i18n="pentagon_pizza">PENTAGON PIZZA INDEX</h3>
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <a href="https://pizzint.watch" target="_blank" style="font-size:10px;color:var(--accent-primary);text-decoration:none;">pizzint.watch ↗</a>
-                    <button id="close-pizza-modal" class="close-btn">&times;</button>
-                </div>
-            </div>
-            <iframe id="pizza-iframe" src="" style="width:100%;height:75vh;border:none;background:#0a0a0a;" loading="lazy" allow="autoplay"></iframe>
-        </div>
-    </div>
+
 
 
     
@@ -503,28 +472,20 @@
                 <div style="font-size:10px;color:#22c55e;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;text-shadow:0 0 8px rgba(34,197,94,0.5);">WebSDR / KiwiSDR Receivers</div>
 
                 <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Middle East & Eastern Mediterranean</div>
-                <a href="http://sdr.cyhams.org:8073/" target="_blank" class="sdr-link-row">
-                    <span>🇨🇾</span><span class="sdr-link-label">Cyprus Amateur Radio Society</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
-                </a>
-                <a href="http://sdr.cyhams.org:8074/" target="_blank" class="sdr-link-row">
-                    <span>🇨🇾</span><span class="sdr-link-label">Cyprus KiwiSDR #2</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
-                </a>
                 <a href="http://web-888.no-ip.org:8073/" target="_blank" class="sdr-link-row">
-                    <span>🇬🇷</span><span class="sdr-link-label">Athens, Greece — SV1BTL</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                    <span>🇬🇷</span><span class="sdr-link-label">Athens, Greece — SV1BTL WEB-888</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
-                <a href="http://sv5sdr.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
-                    <span>🇬🇷</span><span class="sdr-link-label">Rhodes Island, Greece</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                <a href="http://midskiwi.ddns.net:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇶🇦</span><span class="sdr-link-label">Doha, Qatar — KiwiSDR</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
-                <a href="http://5b4az.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
-                    <span>🇨🇾</span><span class="sdr-link-label">Nicosia, Cyprus — 5B4AZ</span><span class="sdr-link-freq">HF</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                <a href="http://i1fqh.proxy.kiwisdr.com:8073/" target="_blank" class="sdr-link-row">
+                    <span>🇮🇹</span><span class="sdr-link-label">Casale Monferrato, Italy</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
-
-                <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Turkey & Black Sea</div>
-                <a href="http://ta4ial.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
-                    <span>🇹🇷</span><span class="sdr-link-label">Ankara, Turkey — TA4IAL</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                <a href="http://marbellasdr.ddns.net/" target="_blank" class="sdr-link-row">
+                    <span>🇪🇸</span><span class="sdr-link-label">Marbella, South Spain</span><span class="sdr-link-freq">WebSDR</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
-                <a href="http://ta1sdr.proxy.kiwisdr.com/" target="_blank" class="sdr-link-row">
-                    <span>🇹🇷</span><span class="sdr-link-label">Istanbul, Turkey</span><span class="sdr-link-freq">0–30 MHz</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
+                <a href="http://9a1cra.ddns.net:8902/" target="_blank" class="sdr-link-row">
+                    <span>🇭🇷</span><span class="sdr-link-label">Križevci, Croatia</span><span class="sdr-link-freq">WebSDR</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
 
                 <div class="sdr-section-label"><i class="fa-solid fa-crosshairs"></i> Ukraine & Eastern Europe</div>
@@ -608,9 +569,6 @@
                 </a>
                 <a href="https://www.broadcastify.com/listen/" target="_blank" class="sdr-link-row">
                     <span>🌐</span><span class="sdr-link-label">Broadcastify — Live Scanners</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
-                </a>
-                <a href="https://shortwave.live/freq?target=ME" target="_blank" class="sdr-link-row">
-                    <span>🌐</span><span class="sdr-link-label">Shortwave.live — ME Schedule</span><i class="fa-solid fa-arrow-up-right-from-square sdr-link-icon"></i>
                 </a>
             </div>
         </div>
